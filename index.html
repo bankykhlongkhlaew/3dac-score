@@ -420,19 +420,19 @@ const CLASSES = [
     id:'basic', name:'Basic Class', color:'#00d4ff',
     combine:true, note:'เฉลี่ยรวม 2 sub-class',
     subs:[
-      { id:'basic_imac', name:'IMAC Basic',    rounds:2, type:'imac',    maxPer:null, desc:'IMAC Basic Schedule – กรอกคะแนนรวมจากใบ score sheet' },
+      { id:'basic_imac', name:'IMAC Basic',    rounds:2, type:'imac_seq', maxPer:null, desc:'IMAC Basic 2026 Known · Total K = 141' },
       { id:'basic_3d',   name:'3D ท่าบังคับ', rounds:2, type:'basic3d', maxPer:80,   desc:'8 ท่าบังคับ × 0–10 คะแนน (ทีละ 0.5) = 80 คะแนนเต็ม' }
     ]
   },
   {
     id:'sportman', name:'IMAC Sportsman', color:'#00ff88',
     combine:false, note:'2 เที่ยวบิน เฉลี่ยรวม',
-    subs:[{ id:'sportman_s', name:'IMAC Sportsman', rounds:2, type:'imac', maxPer:null, desc:'IMAC Sportsman Schedule' }]
+    subs:[{ id:'sportman_s', name:'IMAC Sportsman', rounds:2, type:'imac_seq', maxPer:null, desc:'IMAC Sportsman 2026 Known · Total K = 234' }]
   },
   {
     id:'inter', name:'IMAC Intermediate', color:'#ffd700',
     combine:false, note:'2 เที่ยวบิน เฉลี่ยรวม',
-    subs:[{ id:'inter_s', name:'IMAC Intermediate', rounds:2, type:'imac', maxPer:null, desc:'IMAC Intermediate Schedule' }]
+    subs:[{ id:'inter_s', name:'IMAC Intermediate', rounds:2, type:'imac_seq', maxPer:null, desc:'IMAC Intermediate 2026 Known · Total K = 303' }]
   },
   {
     id:'class3d', name:'3D Class', color:'#a78bfa',
@@ -662,6 +662,7 @@ async function pullAllScores(){
         if(!S.scores[cls][sub][judgeOrPairId][pid]) S.scores[cls][sub][judgeOrPairId][pid]={};
         const d={penalty:penaltyId,submitted:true};
         if(scoreType==='basic3d') Object.assign(d,rawJSON);
+        else if(scoreType==='imac_seq') Object.assign(d,rawJSON);
         else if(scoreType==='smack') d.wow=rawScore;
         else d.total=rawScore;
         S.scores[cls][sub][judgeOrPairId][pid][round]=d;
@@ -700,6 +701,10 @@ function buildPayload(jid,pid,cid,sid,round,scoreType){
   if(scoreType==='basic3d'){
     BASIC3D.forEach(m=>{ rawJSON[m.id]=d[m.id]||0; });
     raw=BASIC3D.reduce((s,m)=>s+(d[m.id]>=0?d[m.id]:0),0);
+  } else if(scoreType==='imac_seq'){
+    const figs=IMAC_SEQ[sid]||[];
+    figs.forEach(f=>{ rawJSON[f.id]=d[f.id]>=0?d[f.id]:0; });
+    raw=figs.reduce((s,f)=>s+(d[f.id]>=0?(d[f.id]/10*f.k):0),0);
   } else if(scoreType==='smack'){
     raw=d.wow>=0?d.wow:0; rawJSON={wow:raw};
   } else {
@@ -808,6 +813,7 @@ function renderClassJudgeForm(tab){
     return;
   }
   if(sDef.type==='basic3d') buildBasic3D(jid,pid,cid,sid,round,`${tab}-content`);
+  else if(sDef.type==='imac_seq') buildIMACSeqForm(jid,pid,cid,sid,round,sDef,`${tab}-content`);
   else buildIMACForm(jid,pid,cid,sid,round,sDef,`${tab}-content`);
 }
 
@@ -907,6 +913,174 @@ function buildTotalBar(raw, penPct, after, round, maxScore){
 // ══════════════════════════════════════════════════
 // BUILD IMAC FORM
 // ══════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+// IMAC SEQUENCE DATA (2026 Known)
+// ══════════════════════════════════════════════════
+const IMAC_SEQ={
+  basic_imac:[
+    {id:'f1', name:'Loop',                     k:10},
+    {id:'f2', name:'Reverse Half Cuban',       k:16},
+    {id:'f3', name:'Roll',                     k:10},
+    {id:'f4', name:'Immelmann',                k:10},
+    {id:'f5', name:'45 Downline',              k:7},
+    {id:'f6', name:'Hammerhead',               k:17},
+    {id:'f7', name:'Humpty Bump',              k:25},
+    {id:'f8', name:'Vertical Upline',          k:18},
+    {id:'f9', name:'Down Sharks Tooth Spin',   k:18},
+    {id:'f10',name:'Split S',                  k:10},
+  ],
+  sportman_s:[
+    {id:'f1', name:'Q Loop',                   k:19},
+    {id:'f2', name:'Bow Tie',                  k:30},
+    {id:'f3', name:'Down Humpty',              k:31},
+    {id:'f4', name:'Split S',                  k:21},
+    {id:'f5', name:'Hammer Head',              k:30},
+    {id:'f6', name:'Goldfish',                 k:21},
+    {id:'f7', name:'Down Humpty Bump',         k:17},
+    {id:'f8', name:'Down Sharks Tooth',        k:27},
+    {id:'f9', name:'180° Inverted Aero Turn',  k:5},
+    {id:'f10',name:'Down Fig N',               k:33},
+  ],
+  inter_s:[
+    {id:'f1', name:'Fig N',                    k:25},
+    {id:'f2', name:'Laydown Humpty',           k:30},
+    {id:'f3', name:'Half Reverse Cuban',       k:34},
+    {id:'f4', name:'Spin',                     k:19},
+    {id:'f5', name:'Hammerhead',               k:42},
+    {id:'f6', name:'Q Loop',                   k:42},
+    {id:'f7', name:'Double Humpty',            k:42},
+    {id:'f8', name:'Vertical Downline',        k:16},
+    {id:'f9', name:'Reverse Laydown Humpty',   k:38},
+    {id:'f10',name:'90° Roller',               k:15},
+  ]
+};
+
+// ── IMAC Sequence Form — กรอก 0–10 × K ต่อท่า ──
+function buildIMACSeqForm(jid,pid,cid,sid,round,sDef,targetId){
+  targetId=targetId||'judge-content';
+  const figs=IMAC_SEQ[sid]||[];
+  const existing=getScoreObj(jid,pid,cid,sid,round)||{};
+  const penKey=existing.penalty||'none';
+  const penPct=PENALTIES.find(p=>p.id===penKey)?.pct||0;
+  const totalK=figs.reduce((s,f)=>s+f.k,0);
+
+  let html='';
+
+  // Fig cards
+  figs.forEach(fig=>{
+    const cur=existing[fig.id]!==undefined?existing[fig.id]:-1;
+    const notSet=(cur===-1);
+    const kScore=notSet?0:+(cur/10*fig.k).toFixed(1);
+    const scored=!notSet&&cur>=0;
+
+    let intRow='<div class="row-label">0–10</div><div class="score-row" style="flex:1;gap:3px">';
+    INT_STEPS.forEach(v=>{
+      const active=(!notSet&&cur===v);
+      intRow+=`<button class="sbtn ${active?'active':''}" style="font-size:13px;padding:7px 2px"
+        onclick="setIMACFigScore('${fig.id}',${v},'${jid}','${pid}','${cid}','${sid}',${round},this)">${v}</button>`;
+    });
+    intRow+='</div>';
+    let halfRow='<div class="row-label">.5</div><div class="score-row" style="flex:1;gap:3px">';
+    HALF_STEPS.forEach(v=>{
+      const active=(!notSet&&cur===v);
+      halfRow+=`<button class="sbtn half ${active?'active':''}" style="font-size:11px;padding:7px 2px"
+        onclick="setIMACFigScore('${fig.id}',${v},'${jid}','${pid}','${cid}','${sid}',${round},this)">${v}</button>`;
+    });
+    halfRow+='</div>';
+
+    html+=`<div class="mnv-card ${scored?'scored':''}" id="imac-fc-${fig.id}-${round}">
+      <div class="mnv-head">
+        <div class="mnv-num" style="font-size:11px">${fig.id.replace('f','')}</div>
+        <div style="flex:1">
+          <div class="mnv-name" style="font-size:14px">${fig.name}</div>
+          <div class="mnv-tip">K = ${fig.k}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="mnv-disp" id="imac-sd-${fig.id}-${round}">${notSet?'–':cur.toFixed(1)}</div>
+          <div style="font-size:11px;color:var(--amber)" id="imac-ks-${fig.id}-${round}">${notSet?'–':kScore} pts</div>
+        </div>
+      </div>
+      <div class="score-grid">
+        <div style="display:flex;gap:3px;align-items:center">${intRow}</div>
+        <div style="display:flex;gap:3px;align-items:center">${halfRow}</div>
+      </div>
+    </div>`;
+  });
+
+  // Penalty
+  let penBtns='';
+  PENALTIES.forEach(pen=>{
+    penBtns+=`<div class="pen-btn ${pen.cls} ${penKey===pen.id?'active':''}"
+      id="pen-${pen.id}-${round}"
+      onclick="setPenalty('${pen.id}','${jid}','${pid}','${cid}','${sid}',${round})">${pen.icon} ${pen.label}</div>`;
+  });
+  html+=`<div class="penalty-box">
+    <div class="penalty-title">⚠️ PENALTY</div>
+    <div class="penalty-btns">${penBtns}</div>
+    <div class="pen-desc">
+      <strong style="color:var(--amber)">–5%</strong> เช่น บินเกินเวลา &nbsp;|&nbsp;
+      <strong style="color:var(--red)">–10%</strong> ละเมิด safety line
+    </div>
+  </div>`;
+
+  // Total bar
+  const {raw,penPctVal,after}=calcIMACSeq(jid,pid,cid,sid,round,figs);
+  html+=`<div class="total-bar">
+    <div class="total-inner">
+      <div>
+        <div class="total-label">คะแนนหลัง Penalty · ROUND ${round}</div>
+        <div class="total-max">/ ${totalK} คะแนนเต็ม (Total K)</div>
+      </div>
+      <div class="total-val" id="tot-after-${round}">${after.toFixed(1)}</div>
+    </div>
+    <div class="total-breakdown">
+      <div>คะแนนดิบ: <span id="tot-raw-${round}">${raw.toFixed(1)}</span></div>
+      <div>Penalty: <span id="tot-pen-${round}">${penPctVal>0?`<span class="pen-tag">−${penPctVal}%</span>`:'<span style="color:var(--green)">ไม่มี</span>'}</span></div>
+    </div>
+  </div>
+  <button class="btn-submit" id="sub-btn"
+    onclick="openModal('${jid}','${pid}','${cid}','${sid}',${round})" ${raw<=0?'disabled':''}>
+    📤 ส่งคะแนน Round ${round}
+  </button>`;
+  document.getElementById(targetId).innerHTML=html;
+}
+
+function setIMACFigScore(figId,val,jid,pid,cid,sid,round,btn){
+  ensureObj(jid,pid,cid,sid,round);
+  const d=S.scores[cid][sid][jid][pid][round];
+  d[figId]=(d[figId]===val)?-1:val;
+  const cur=d[figId];
+  // update buttons
+  const card=document.getElementById(`imac-fc-${figId}-${round}`);
+  if(card){
+    card.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('active'));
+    if(cur>=0){
+      card.querySelectorAll('.sbtn').forEach(b=>{ if(parseFloat(b.textContent)===cur) b.classList.add('active'); });
+      card.classList.add('scored');
+    } else card.classList.remove('scored');
+  }
+  const sd=document.getElementById(`imac-sd-${figId}-${round}`);
+  const ks=document.getElementById(`imac-ks-${figId}-${round}`);
+  const figs=IMAC_SEQ[sid]||[];
+  const fig=figs.find(f=>f.id===figId);
+  if(sd) sd.textContent=cur>=0?cur.toFixed(1):'–';
+  if(ks) ks.textContent=cur>=0?(+(cur/10*fig.k).toFixed(1))+' pts':'–';
+  // update totals
+  const {raw,penPctVal,after}=calcIMACSeq(jid,pid,cid,sid,round,figs);
+  const ta=document.getElementById(`tot-after-${round}`); if(ta) ta.textContent=after.toFixed(1);
+  const tr=document.getElementById(`tot-raw-${round}`); if(tr) tr.textContent=raw.toFixed(1);
+  const sb=document.getElementById('sub-btn'); if(sb) sb.disabled=(raw<=0);
+}
+
+function calcIMACSeq(jid,pid,cid,sid,round,figs){
+  const d=getScoreObj(jid,pid,cid,sid,round);
+  figs=figs||IMAC_SEQ[sid]||[];
+  const raw=d?figs.reduce((s,f)=>{ const v=d[f.id]; return s+(v>=0?(v/10*f.k):0); },0):0;
+  const penPctVal=PENALTIES.find(p=>p.id===(d?.penalty||'none'))?.pct||0;
+  const after=+(raw*(1-penPctVal/100)).toFixed(2);
+  return {raw,penPctVal,after};
+}
+
 function buildIMACForm(jid,pid,cid,sid,round,sDef,targetId){
   targetId=targetId||'judge-content';
   const existing=getScoreObj(jid,pid,cid,sid,round)||{};
@@ -1197,6 +1371,10 @@ function refreshTotals(jid,pid,cid,sid,round,imacRaw){
     const r=calcB3D(jid,pid,cid,sid,round);
     raw=r.raw; after=r.after; penPct=r.penPct;
     const sb=document.getElementById('sub-btn');if(sb) sb.disabled=(raw<=0);
+  } else if(sDef.type==='imac_seq'){
+    const r=calcIMACSeq(jid,pid,cid,sid,round);
+    raw=r.raw; after=r.after; penPct=r.penPctVal;
+    const sb=document.getElementById('sub-btn');if(sb) sb.disabled=(raw<=0);
   } else if(sDef.type==='smack'){
     const r=calcSmack(jid,pid,cid,sid,round);
     raw=r.raw; after=r.after; penPct=r.penPct;
@@ -1251,6 +1429,11 @@ function getFinal(jid,pid,cid,sid,round){
     const raw=BASIC3D.reduce((s,m)=>{const v=d[m.id];return s+(v>=0?v:0);},0);
     return +(raw*(1-penPct/100)).toFixed(4);
   }
+  if(sDef?.type==='imac_seq'){
+    const figs=IMAC_SEQ[sid]||[];
+    const raw=figs.reduce((s,f)=>{const v=d[f.id];return s+(v>=0?(v/10*f.k):0);},0);
+    return +(raw*(1-penPct/100)).toFixed(4);
+  }
   if(sDef?.type==='smack'){
     const raw=d.wow>=0?d.wow:0;
     return +(raw*(1-penPct/100)).toFixed(4);
@@ -1268,6 +1451,8 @@ function openModal(jid,pid,cid,sid,round){
   let raw,after,penPct,penLabel;
   if(sDef?.type==='basic3d'){
     const r=calcB3D(jid,pid,cid,sid,round); raw=r.raw; after=r.after; penPct=r.penPct;
+  } else if(sDef?.type==='imac_seq'){
+    const r=calcIMACSeq(jid,pid,cid,sid,round); raw=r.raw; after=r.after; penPct=r.penPctVal;
   } else if(sDef?.type==='smack'){
     const r=calcSmack(jid,pid,cid,sid,round); raw=r.raw; after=r.after; penPct=r.penPct;
   } else {
