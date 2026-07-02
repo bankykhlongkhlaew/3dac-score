@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RC 3D Championship · Live Score</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Sarabun:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sky:#0a0e1a; --card:#111b2e; --card2:#0e1828;
+  --border:#1e3a5f; --border2:#162d4a;
+  --accent:#00d4ff; --gold:#ffd700; --silver:#c0c8d8; --bronze:#cd7f32;
+  --green:#00ff88; --red:#ff4060; --amber:#ffaa00; --purple:#a78bfa;
+  --text:#e8f0ff; --dim:#5a7a9a;
+  --glow:0 0 18px rgba(0,212,255,.35);
+  --glow-gold:0 0 20px rgba(255,215,0,.45);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sarabun',sans-serif;background:var(--sky);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* NAV */
+.nav{display:flex;background:#060c18;border-bottom:2px solid var(--border);position:sticky;top:0;z-index:100}
+.nav-tab{flex:1;padding:13px 5px;text-align:center;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:.5px;color:var(--dim);transition:all .25s;border-bottom:3px solid transparent}
+.nav-tab:hover{color:var(--accent)}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);background:rgba(0,212,255,.05)}
+
+.page{display:none}.page.active{display:block}
+.wrap{max-width:820px;margin:0 auto;padding:22px 14px}
+.section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.sec-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--accent);letter-spacing:2px;margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid var(--border)}
+.pg-title{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--accent);text-align:center;letter-spacing:3px;margin-bottom:4px}
+.pg-sub{text-align:center;color:var(--dim);font-size:12px;margin-bottom:22px;letter-spacing:1px}
+
+input[type=text],select{background:#0a1520;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 12px;font-family:'Sarabun',sans-serif;font-size:14px;outline:none;transition:border .2s;width:100%}
+input[type=text]:focus,select:focus{border-color:var(--accent)}
+.row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.row input,.row select{flex:1}
+.row .w140{width:140px;flex:none}
+
+.btn{border:none;border-radius:8px;padding:8px 14px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-add{background:rgba(0,212,255,.1);color:var(--accent);border:1px solid var(--accent)}
+.btn-add:hover{background:rgba(0,212,255,.22)}
+.btn-del{background:rgba(255,64,96,.1);color:var(--red);border:1px solid var(--red)}
+.btn-del:hover{background:rgba(255,64,96,.22)}
+.btn-primary{background:linear-gradient(135deg,#005fa3,#00add4);color:#fff;font-size:15px;padding:13px 28px;letter-spacing:2px;width:100%;margin-top:6px;box-shadow:0 4px 16px rgba(0,140,190,.32)}
+.btn-primary:hover{box-shadow:0 6px 26px rgba(0,140,190,.5);transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
+label.lbl{display:block;color:var(--dim);font-size:11px;margin-bottom:4px;margin-top:10px;letter-spacing:.5px}
+
+/* class pills */
+.class-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:9px;margin-bottom:12px}
+.class-pill{background:#0a1520;border:2px solid var(--border2);border-radius:10px;padding:11px 13px;cursor:pointer;transition:all .2s;user-select:none}
+.class-pill:hover{border-color:var(--accent)}
+.class-pill.active{border-color:var(--accent);background:rgba(0,212,255,.07)}
+.class-pill-hd{display:flex;align-items:center;gap:7px;margin-bottom:3px}
+.class-check{width:15px;height:15px;flex-shrink:0;accent-color:var(--accent)}
+.cpname{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px}
+.cpsub{font-size:11px;color:var(--dim);padding-left:22px}
+.cpnote{font-size:11px;color:var(--amber);padding-left:22px;margin-top:2px}
+
+/* JUDGE PAGE */
+.judge-header{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 15px;display:flex;gap:9px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px}
+.jh-grp{display:flex;flex-direction:column;gap:3px;flex:1;min-width:110px}
+.jh-grp label{font-size:10px;color:var(--dim);letter-spacing:.5px}
+.jh-grp select{padding:7px 9px;font-size:13px}
+.flight-badge{background:rgba(255,215,0,.1);border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:7px 12px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;white-space:nowrap;align-self:flex-end}
+
+/* Maneuver cards */
+.mnv-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 16px;margin-bottom:10px;transition:border-color .2s}
+.mnv-card.scored{border-color:var(--green)}
+.mnv-head{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.mnv-num{width:28px;height:28px;border-radius:50%;background:rgba(0,212,255,.12);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;color:var(--accent);flex-shrink:0}
+.mnv-name{font-size:14px;font-weight:700;line-height:1.2}
+.mnv-tip{font-size:11px;color:var(--dim);margin-top:1px}
+.mnv-disp{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:22px;font-weight:700;color:var(--gold);min-width:42px;text-align:right}
+
+/* Score grid 0.5 steps – two rows: integers top, .5 bottom */
+.score-grid{display:flex;flex-direction:column;gap:4px}
+.score-row{display:flex;gap:4px}
+.sbtn{flex:1;padding:7px 2px;background:#0a1520;border:1px solid var(--border2);color:var(--dim);border-radius:6px;font-family:'Share Tech Mono',monospace;font-weight:700;font-size:13px;cursor:pointer;transition:all .12s;text-align:center;min-width:0}
+.sbtn:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,.08)}
+.sbtn.active{background:linear-gradient(135deg,#005fa3,#00add4);border-color:var(--accent);color:#fff;box-shadow:0 0 10px rgba(0,180,255,.4)}
+.sbtn.half{font-size:11px;color:var(--dim)}
+.sbtn.half.active{background:linear-gradient(135deg,#004488,#0088bb)}
+.row-label{font-size:9px;color:var(--dim);letter-spacing:.5px;font-family:'Rajdhani',sans-serif;font-weight:700;padding-top:4px;width:28px;flex-shrink:0;text-align:right;padding-right:2px}
+
+/* Penalty section */
+.penalty-box{background:#0d0f1a;border:1px solid rgba(255,64,96,.3);border-radius:11px;padding:14px 16px;margin:14px 0}
+.penalty-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--red);letter-spacing:2px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.penalty-btns{display:flex;gap:8px;flex-wrap:wrap}
+.pen-btn{flex:1;min-width:120px;padding:10px 8px;border-radius:8px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;cursor:pointer;text-align:center;transition:all .15s;border:2px solid}
+.pen-5{background:rgba(255,170,0,.08);border-color:rgba(255,170,0,.4);color:var(--amber)}
+.pen-5.active{background:rgba(255,170,0,.25);border-color:var(--amber);box-shadow:0 0 12px rgba(255,170,0,.35)}
+.pen-10{background:rgba(255,64,96,.08);border-color:rgba(255,64,96,.35);color:var(--red)}
+.pen-10.active{background:rgba(255,64,96,.22);border-color:var(--red);box-shadow:0 0 12px rgba(255,64,96,.35)}
+.pen-none{background:rgba(0,255,136,.07);border-color:rgba(0,255,136,.3);color:var(--green)}
+.pen-none.active{background:rgba(0,255,136,.2);border-color:var(--green);box-shadow:0 0 10px rgba(0,255,136,.3)}
+.pen-desc{font-size:11px;color:var(--dim);margin-top:8px;line-height:1.6}
+
+/* Total bar */
+.total-bar{background:rgba(0,212,255,.04);border:1px solid var(--accent);border-radius:11px;padding:13px 16px;margin:12px 0}
+.total-inner{display:flex;align-items:center;justify-content:space-between}
+.total-label{font-family:'Rajdhani',sans-serif;font-size:12px;color:var(--dim);letter-spacing:1px}
+.total-val{font-family:'Share Tech Mono',monospace;font-size:32px;font-weight:700;color:var(--accent)}
+.total-max{font-size:12px;color:var(--dim)}
+.total-breakdown{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--dim)}
+.total-breakdown span{color:var(--text)}
+.total-breakdown .pen-tag{color:var(--red);font-weight:700}
+
+.btn-submit{width:100%;padding:14px;background:linear-gradient(135deg,#005533,#009955);color:#fff;border:none;border-radius:11px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:16px;letter-spacing:2px;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(0,150,80,.25);margin-bottom:26px}
+.btn-submit:hover{box-shadow:0 6px 26px rgba(0,150,80,.42);transform:translateY(-1px)}
+.btn-submit:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* IMAC input */
+.imac-wrap{background:#0a1520;border:1px solid var(--border);border-radius:10px;padding:18px;margin-top:8px;text-align:center}
+.imac-wrap input[type=number]{background:transparent;border:none;border-bottom:2px solid var(--accent);border-radius:0;font-family:'Share Tech Mono',monospace;font-size:34px;color:var(--accent);text-align:center;padding:8px 0;letter-spacing:3px;width:100%;outline:none}
+.imac-wrap input[type=number]:focus{border-bottom-color:var(--gold)}
+.imac-hint{font-size:11px;color:var(--dim);margin-top:8px}
+
+/* BOARD */
+.board-wrap{padding:18px 12px;max-width:1200px;margin:0 auto}
+.board-title{font-family:'Rajdhani',sans-serif;font-size:clamp(20px,5vw,42px);font-weight:700;letter-spacing:4px;color:var(--accent);text-shadow:var(--glow);text-align:center}
+.board-sub{color:var(--dim);font-size:11px;text-align:center;letter-spacing:2px;margin-bottom:18px}
+.class-tabs,.sub-tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:10px}
+.class-tab,.sub-tab{padding:6px 14px;background:var(--card);border:1px solid var(--border);border-radius:18px;color:var(--dim);font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;letter-spacing:.5px;cursor:pointer;transition:all .2s}
+.class-tab:hover{color:var(--accent);border-color:var(--accent)}
+.class-tab.active{background:rgba(0,212,255,.1);color:var(--accent);border-color:var(--accent)}
+.sub-tab:hover{color:var(--purple);border-color:var(--purple)}
+.sub-tab.active{background:rgba(167,139,250,.1);color:var(--purple);border-color:var(--purple)}
+.sub-tabs{margin-bottom:18px;min-height:32px}
+
+.podium-row{display:flex;gap:9px;justify-content:center;margin-bottom:18px;flex-wrap:wrap}
+.podium-card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:16px 12px;text-align:center;flex:1;min-width:145px;max-width:230px;transition:transform .2s}
+.podium-card:hover{transform:translateY(-2px)}
+.podium-card.rank-1{border-color:var(--gold);box-shadow:var(--glow-gold)}
+.podium-card.rank-2{border-color:var(--silver)}
+.podium-card.rank-3{border-color:var(--bronze)}
+.pd-rank{font-family:'Rajdhani',sans-serif;font-size:34px;font-weight:700;line-height:1}
+.rank-1 .pd-rank{color:var(--gold)}.rank-2 .pd-rank{color:var(--silver)}.rank-3 .pd-rank{color:var(--bronze)}
+.pd-pilot{font-size:14px;font-weight:700;margin:6px 0 2px}
+.pd-plane{font-size:10px;color:var(--dim);margin-bottom:7px}
+.pd-score{font-family:'Share Tech Mono',monospace;font-size:24px}
+.pd-score span{font-size:10px;color:var(--dim)}
+.pd-wt{font-family:'Rajdhani',sans-serif;font-size:11px;color:var(--dim);margin-top:2px}
+.pd-wt em{color:var(--amber);font-style:normal;font-weight:700}
+
+.stbl-wrap{overflow-x:auto;margin-bottom:8px}
+table.stbl{width:100%;border-collapse:collapse;font-size:12px}
+.stbl th{background:#08111e;color:var(--dim);font-family:'Rajdhani',sans-serif;font-weight:700;font-size:10px;letter-spacing:1px;padding:8px 9px;text-align:center;border-bottom:2px solid var(--border);white-space:nowrap}
+.stbl th:nth-child(1),.stbl td:nth-child(1),.stbl th:nth-child(2),.stbl td:nth-child(2){text-align:left}
+.stbl td{padding:10px 9px;border-bottom:1px solid rgba(30,58,95,.4);text-align:center;vertical-align:middle}
+.stbl tr:hover td{background:rgba(0,212,255,.02)}
+.rk{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px}
+.rk1{background:rgba(255,215,0,.18);color:var(--gold);border:1px solid var(--gold)}
+.rk2{background:rgba(192,200,216,.13);color:var(--silver);border:1px solid var(--silver)}
+.rk3{background:rgba(205,127,50,.13);color:var(--bronze);border:1px solid var(--bronze)}
+.rkn{background:rgba(90,122,154,.12);color:var(--dim);border:1px solid var(--dim)}
+.pilot-cell{font-weight:700;font-size:13px}
+.plane-cell{font-size:10px;color:var(--dim)}
+.mono{font-family:'Share Tech Mono',monospace;font-size:14px;font-weight:700}
+.wt-score{font-family:'Rajdhani',sans-serif;font-size:12px;color:var(--amber);font-weight:700}
+.jsm{background:#0a1520;border:1px solid var(--border);border-radius:3px;padding:1px 4px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--silver);display:inline-block}
+.jsm.pend{color:var(--dim);opacity:.4}
+
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:5px;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,255,136,.4)}50%{opacity:.7;box-shadow:0 0 0 5px rgba(0,255,136,0)}}
+.board-footer{display:flex;align-items:center;justify-content:space-between;padding:9px 0;margin-top:5px;border-top:1px solid var(--border);font-size:10px;color:var(--dim)}
+
+.empty-state{text-align:center;padding:48px 18px;color:var(--dim)}
+.empty-state .icon{font-size:40px;margin-bottom:10px}
+.empty-state p{font-size:14px;line-height:1.9}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--accent);border-radius:14px;padding:26px;max-width:400px;width:92%;text-align:center}
+.modal h3{font-family:'Rajdhani',sans-serif;font-size:19px;color:var(--green);margin-bottom:8px}
+.modal p{color:var(--dim);font-size:13px;margin-bottom:16px;line-height:1.75}
+.modal-btns{display:flex;gap:8px}
+.modal-btns .btn{flex:1}
+.toast{position:fixed;bottom:16px;right:14px;z-index:300;background:var(--card);border:1px solid var(--green);border-radius:9px;padding:10px 17px;color:var(--green);font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;opacity:0;transform:translateY(8px);transition:all .3s}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* ══ AEROMUSICAL ══ */
+.aero-pair-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:6px}
+.aero-pair-card{background:#0a1520;border:1px solid var(--border2);border-radius:10px;padding:13px 14px}
+.aero-pair-card .pair-label{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;color:var(--purple);letter-spacing:1px;margin-bottom:8px}
+.aero-pair-card select{margin-bottom:6px}
+.aero-pair-name{font-size:11px;color:var(--dim);margin-top:4px}
+.aero-pair-name strong{color:var(--accent)}
+.aero-crit-tag{display:inline-block;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.4);color:var(--purple);border-radius:6px;padding:2px 8px;font-size:10px;font-family:'Rajdhani',sans-serif;font-weight:700;margin-top:6px;margin-right:4px}
+
+.crit-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px 18px;margin-bottom:12px;transition:border-color .2s}
+.crit-card.scored{border-color:var(--green)}
+.crit-head{display:flex;align-items:center;gap:9px;margin-bottom:8px;flex-wrap:wrap}
+.crit-name{font-size:15px;font-weight:700;color:var(--text)}
+.crit-th{font-size:12px;color:var(--purple);margin-top:1px}
+.crit-max{margin-left:auto;font-family:'Rajdhani',sans-serif;font-size:13px;color:var(--amber);font-weight:700;letter-spacing:1px;white-space:nowrap}
+.crit-calc{display:flex;align-items:center;gap:10px;margin-top:10px;background:#0a1520;border:1px solid var(--border);border-radius:9px;padding:10px 14px}
+.crit-calc-raw{font-family:'Share Tech Mono',monospace;font-size:26px;font-weight:700;color:var(--accent);min-width:50px}
+.crit-calc-arrow{color:var(--dim);font-size:18px}
+.crit-calc-final{font-family:'Share Tech Mono',monospace;font-size:26px;font-weight:700;color:var(--gold)}
+.crit-calc-label{font-size:10px;color:var(--dim);letter-spacing:.5px}
+
+@media(max-width:480px){ .aero-pair-grid{grid-template-columns:1fr} }
+
+@media(max-width:480px){
+  .judge-header{flex-direction:column}
+  .podium-card{min-width:120px;padding:11px 9px}
+  .pd-rank{font-size:26px}.pd-score{font-size:20px}
+  .nav-tab{font-size:11px;padding:10px 3px}
+  .score-row .sbtn{font-size:11px;padding:6px 1px}
+}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-tab active" onclick="showPage('setup')">⚙️ ตั้งค่า</div>
+  <div class="nav-tab" onclick="showPage('basic')">🛩️ Basic Class</div>
+  <div class="nav-tab" onclick="showPage('sportman')">🎯 IMAC Sportsman</div>
+  <div class="nav-tab" onclick="showPage('inter')">⭐ IMAC Intermediate</div>
+  <div class="nav-tab" onclick="showPage('class3d')">🎵 3D Class</div>
+  <div class="nav-tab" onclick="showPage('board')">🏆 Scoreboard</div>
+</div>
+
+<!-- ═══ SETUP ═══ -->
+<div id="page-setup" class="page active">
+<div class="wrap">
+  <div class="pg-title">RC 3D CHAMPIONSHIP</div>
+  <div class="pg-sub">LIVE SCORE SYSTEM · ตั้งค่าการแข่งขัน</div>
+
+  <div class="section">
+    <div class="sec-title">🏁 ประเภทการแข่งขัน</div>
+    <p style="font-size:11px;color:var(--dim);margin-bottom:12px">เลือกประเภทที่ใช้งานวันนี้ (เลือกได้หลายประเภท)</p>
+    <div class="class-grid" id="class-grid"></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title">✈️ รายชื่อนักบิน</div>
+    <div id="pilots-list"></div>
+    <button class="btn btn-add" onclick="addPilot()" style="margin-top:4px">+ เพิ่มนักบิน</button>
+  </div>
+
+  <div class="section">
+    <div class="sec-title">👨‍⚖️ กรรมการ (3–5 ท่าน)</div>
+    <div id="judges-list"></div>
+    <button class="btn btn-add" onclick="addJudge()" style="margin-top:4px">+ เพิ่มกรรมการ</button>
+  </div>
+
+  <div class="section">
+    <div class="sec-title">🎵 จับคู่กรรมการ – 3D Aeromusical</div>
+    <p style="font-size:11px;color:var(--dim);margin-bottom:12px">
+      ใช้กรรมการ 6 ท่าน จับคู่เป็น 3 คู่ (Pair A/B/C) แต่ละคู่ดู 2 เกณฑ์ และกรอกคะแนนร่วมกันเป็นค่าเดียว
+    </p>
+    <div class="aero-pair-grid" id="aero-pair-grid"></div>
+  </div>
+
+  <button class="btn btn-primary" onclick="startContest()">🚀 เริ่มการแข่งขัน</button>
+  <div style="margin-top:12px;text-align:center">
+    <button onclick="loadFromSheet()" style="background:rgba(167,139,250,.1);border:1px solid var(--purple);color:var(--purple);border-radius:8px;padding:10px 24px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;cursor:pointer">
+      📥 โหลดข้อมูลจาก Google Sheet (กรณีเปิดหน้าใหม่)
+    </button>
+    <div style="font-size:11px;color:var(--dim);margin-top:6px">ใช้เมื่อกรรมการเปิดไฟล์บน iPad เครื่องอื่น เพื่อดึงรายชื่อและคะแนนที่บันทึกไว้</div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ BASIC CLASS ═══ -->
+<div id="page-basic" class="page">
+<div class="wrap" style="max-width:680px">
+  <div class="judge-header">
+    <div class="jh-grp">
+      <label>กรรมการ</label>
+      <select id="basic-sel-judge" onchange="renderClassJudgeForm('basic')"></select>
+    </div>
+    <div class="jh-grp">
+      <label>นักบิน</label>
+      <select id="basic-sel-pilot" onchange="renderClassJudgeForm('basic')"></select>
+    </div>
+    <div class="jh-grp">
+      <label>Sub-class</label>
+      <select id="basic-sel-sub" onchange="renderClassJudgeForm('basic')"></select>
+    </div>
+    <div class="flight-badge" id="basic-flight-badge">ROUND 1</div>
+  </div>
+  <div id="basic-content">
+    <div class="empty-state"><div class="icon">🛩️</div><p>เลือกกรรมการ, นักบิน และ Sub-class<br>เพื่อเริ่มให้คะแนน Basic Class</p></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ IMAC SPORTSMAN ═══ -->
+<div id="page-sportman" class="page">
+<div class="wrap" style="max-width:680px">
+  <div class="judge-header">
+    <div class="jh-grp">
+      <label>กรรมการ</label>
+      <select id="sportman-sel-judge" onchange="renderClassJudgeForm('sportman')"></select>
+    </div>
+    <div class="jh-grp">
+      <label>นักบิน</label>
+      <select id="sportman-sel-pilot" onchange="renderClassJudgeForm('sportman')"></select>
+    </div>
+    <div class="flight-badge" id="sportman-flight-badge">ROUND 1</div>
+  </div>
+  <div id="sportman-content">
+    <div class="empty-state"><div class="icon">🎯</div><p>เลือกกรรมการ และนักบิน<br>เพื่อเริ่มให้คะแนน IMAC Sportsman</p></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ IMAC INTERMEDIATE ═══ -->
+<div id="page-inter" class="page">
+<div class="wrap" style="max-width:680px">
+  <div class="judge-header">
+    <div class="jh-grp">
+      <label>กรรมการ</label>
+      <select id="inter-sel-judge" onchange="renderClassJudgeForm('inter')"></select>
+    </div>
+    <div class="jh-grp">
+      <label>นักบิน</label>
+      <select id="inter-sel-pilot" onchange="renderClassJudgeForm('inter')"></select>
+    </div>
+    <div class="flight-badge" id="inter-flight-badge">ROUND 1</div>
+  </div>
+  <div id="inter-content">
+    <div class="empty-state"><div class="icon">⭐</div><p>เลือกกรรมการ และนักบิน<br>เพื่อเริ่มให้คะแนน IMAC Intermediate</p></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ 3D CLASS (Aeromusical / Smack) ═══ -->
+<div id="page-class3d" class="page">
+<div class="wrap" style="max-width:680px">
+  <div class="judge-header">
+    <div class="jh-grp">
+      <label>Sub-class</label>
+      <select id="c3d-sel-sub" onchange="onC3DSubChange()">
+        <option value="aero">🎵 Aeromusical</option>
+        <option value="smack">🔥 Smack</option>
+      </select>
+    </div>
+    <div class="jh-grp" id="c3d-pair-grp">
+      <label>คู่กรรมการ</label>
+      <select id="aero-sel-pair" onchange="renderAeroForm()"></select>
+    </div>
+    <div class="jh-grp" id="c3d-judge-grp" style="display:none">
+      <label>กรรมการ</label>
+      <select id="smack-sel-judge" onchange="renderSmackForm()"></select>
+    </div>
+    <div class="jh-grp">
+      <label>นักบิน</label>
+      <select id="c3d-sel-pilot" onchange="onC3DSelectionChange()"></select>
+    </div>
+    <div class="flight-badge" id="c3d-flight-badge">ROUND 1</div>
+  </div>
+  <div id="c3d-content">
+    <div class="empty-state"><div class="icon">🎵</div><p>เลือก Sub-class, คู่กรรมการ และนักบิน<br>เพื่อเริ่มให้คะแนน 3D Class</p></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ BOARD ═══ -->
+<div id="page-board" class="page">
+<div class="board-wrap">
+  <div style="padding:14px 0 6px">
+    <div class="board-title">RC 3D CHAMPIONSHIP</div>
+    <div class="board-sub">LIVE SCOREBOARD · Thailand 3D Competition</div>
+  </div>
+  <div class="class-tabs" id="board-class-tabs"></div>
+  <div class="sub-tabs" id="board-sub-tabs"></div>
+  <div id="board-content">
+    <div class="empty-state"><div class="icon">🏆</div><p>ยังไม่มีข้อมูลการแข่งขัน<br>ตั้งค่าและเริ่มการแข่งขันก่อน</p></div>
+  </div>
+  <div class="board-footer">
+    <div><span class="live-dot"></span>อัปเดตอัตโนมัติ &nbsp;|&nbsp; <span id="sync-status" style="font-size:11px">–</span></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button onclick="refreshFromSheet()" style="background:rgba(0,212,255,.12);border:1px solid var(--accent);color:var(--accent);border-radius:7px;padding:5px 12px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;cursor:pointer;letter-spacing:1px">🔄 รีเฟรชจาก Sheet</button>
+      <div id="last-update">–</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <h3>✅ ยืนยันส่งคะแนน</h3>
+    <p id="confirm-text"></p>
+    <div class="modal-btns">
+      <button class="btn btn-del" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn btn-primary" style="width:auto;margin-top:0" onclick="confirmSubmit()">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════════════════
+
+// Score steps: 0, 0.5, 1, 1.5 … 10
+const SCORE_STEPS = [];
+for(let v=0; v<=10; v+=0.5) SCORE_STEPS.push(v);
+// Integer steps row: 0,1,2,...10
+const INT_STEPS  = SCORE_STEPS.filter(v=>v===Math.floor(v));
+// Half steps row: 0.5,1.5,...9.5
+const HALF_STEPS = SCORE_STEPS.filter(v=>v!==Math.floor(v));
+
+const PENALTIES = [
+  { id:'none', label:'ไม่มี Penalty', pct:0,  cls:'pen-none', icon:'✓' },
+  { id:'p5',   label:'–5% (เกินเวลา / เส้น Safety)', pct:5,  cls:'pen-5',  icon:'⚠️' },
+  { id:'p10',  label:'–10% (ละเมิด Safety Zone)',     pct:10, cls:'pen-10', icon:'🚨' },
+];
+
+const CLASSES = [
+  {
+    id:'basic', name:'Basic Class', color:'#00d4ff',
+    combine:true, note:'เฉลี่ยรวม 2 sub-class',
+    subs:[
+      { id:'basic_imac', name:'IMAC Basic',    rounds:2, type:'imac',    maxPer:null, desc:'IMAC Basic Schedule – กรอกคะแนนรวมจากใบ score sheet' },
+      { id:'basic_3d',   name:'3D ท่าบังคับ', rounds:2, type:'basic3d', maxPer:80,   desc:'8 ท่าบังคับ × 0–10 คะแนน (ทีละ 0.5) = 80 คะแนนเต็ม' }
+    ]
+  },
+  {
+    id:'sportman', name:'IMAC Sportsman', color:'#00ff88',
+    combine:false, note:'2 เที่ยวบิน เฉลี่ยรวม',
+    subs:[{ id:'sportman_s', name:'IMAC Sportsman', rounds:2, type:'imac', maxPer:null, desc:'IMAC Sportsman Schedule' }]
+  },
+  {
+    id:'inter', name:'IMAC Intermediate', color:'#ffd700',
+    combine:false, note:'2 เที่ยวบิน เฉลี่ยรวม',
+    subs:[{ id:'inter_s', name:'IMAC Intermediate', rounds:2, type:'imac', maxPer:null, desc:'IMAC Intermediate Schedule' }]
+  },
+  {
+    id:'class3d', name:'3D Class', color:'#a78bfa',
+    combine:'best', note:'เลือก Best Flight ของแต่ละ sub-class แล้วเฉลี่ยรวม',
+    subs:[
+      { id:'c3d_aero',  name:'Aeromusical', rounds:2, type:'aero',  maxPer:null, desc:'3D Aeromusical – 2 เที่ยวบิน (Pair A/B/C ให้คะแนน)' },
+      { id:'c3d_smack', name:'Smack',       rounds:2, type:'smack', maxPer:10,  desc:'3D Smack – 2 เที่ยวบิน (Wow Factor 0–10 ทีละ 0.5)' }
+    ]
+  }
+];
+
+const BASIC3D = [
+  {id:'m1', name:'Harrier',                        tip:'มุมหัวสูง 35–45° ความเร็วต่ำคงที่'},
+  {id:'m2', name:'Hover',                          tip:'เครื่องตั้งตรง อยู่ตำแหน่งเดิม คุม torque'},
+  {id:'m3', name:'Knife-Edge Spin (10 รอบ)',        tip:'แกน spin ชัด หมุนสม่ำเสมอ ครบ 10 รอบ'},
+  {id:'m4', name:'Pop Top',                        tip:'Snap หมุนเร็วและหยุดทันทีหลัง snap'},
+  {id:'m5', name:'Blender → Flat Spin',            tip:'transition roll → snap → flat spin ชัด'},
+  {id:'m6', name:'Knife Edge High Alpha',          tip:'บิน knife-edge ที่มุม AOA สูง คุมเสถียร'},
+  {id:'m7', name:'Knife Edge → Snap → Knife Edge', tip:'snap ตรงกลางชัด และกลับสู่ knife edge'},
+  {id:'m8', name:'Crankshaft / Flip-Out',          tip:'snap เปลี่ยนแกนชัด หมุนครบ 2 รอบ หรือ flip-out คม'},
+];
+
+// ══════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════
+let S = {
+  activeClasses:['basic'],
+  pilots:[], judges:[],
+  scores:{},      // [cid][sid][jid][pid][round] = {m1..m8|total, penalty:'none'|'p5'|'p10', submitted}
+  started:false,
+  bClass:'basic', bSub:null,
+};
+
+// ══════════════════════════════════════════════════
+// SETUP
+// ══════════════════════════════════════════════════
+function renderClassGrid() {
+  document.getElementById('class-grid').innerHTML = CLASSES.map(c=>{
+    const on=S.activeClasses.includes(c.id);
+    return `<div class="class-pill ${on?'active':''}" onclick="toggleClass('${c.id}')">
+      <div class="class-pill-hd">
+        <input class="class-check" type="checkbox" ${on?'checked':''} onclick="event.stopPropagation()">
+        <span class="cpname" style="color:${c.color}">${c.name}</span>
+      </div>
+      <div class="cpsub">${c.subs.map(s=>s.name+' ('+s.rounds+'R)').join(' + ')}</div>
+      <div class="cpnote">${c.note}</div>
+    </div>`;
+  }).join('');
+}
+function toggleClass(id){
+  const i=S.activeClasses.indexOf(id);
+  if(i>=0) S.activeClasses.splice(i,1); else S.activeClasses.push(id);
+  renderClassGrid();
+}
+
+function renderPilots(){
+  document.getElementById('pilots-list').innerHTML=S.pilots.map((p,i)=>`
+    <div class="row">
+      <input type="text" placeholder="ชื่อนักบิน ${i+1}" value="${p.name}" oninput="S.pilots[${i}].name=this.value">
+      <input type="text" class="w140" placeholder="เครื่องบิน" value="${p.plane}" oninput="S.pilots[${i}].plane=this.value">
+      <button class="btn btn-del" onclick="S.pilots.splice(${i},1);renderPilots()">✕</button>
+    </div>`).join('');
+}
+function addPilot(){ S.pilots.push({id:'p'+Date.now(),name:'',plane:''}); renderPilots(); }
+
+function renderJudgeSetup(){
+  document.getElementById('judges-list').innerHTML=S.judges.map((j,i)=>`
+    <div class="row">
+      <input type="text" placeholder="กรรมการ ${i+1}" value="${j.name}" oninput="S.judges[${i}].name=this.value;syncAeroJudgeNames()">
+      <button class="btn btn-del" onclick="S.judges.splice(${i},1);renderJudgeSetup();renderAeroPairSetup()">✕</button>
+    </div>`).join('');
+}
+function addJudge(){
+  if(S.judges.length>=6){showToast('สูงสุด 6 ท่าน (สำหรับ Aeromusical 3 คู่)');return;}
+  S.judges.push({id:'j'+Date.now(),name:''});
+  renderJudgeSetup();
+  renderAeroPairSetup();
+}
+function syncAeroJudgeNames(){
+  AERO_PAIRS.forEach(pid=>{
+    const lbl=document.getElementById(`aero-pair-name-${pid}`);
+    if(lbl) lbl.textContent=aeroPairLabel(pid);
+  });
+  // refresh dropdown option labels too
+  document.querySelectorAll('.aero-pair-card select').forEach(sel=>{
+    const val=sel.value;
+    sel.innerHTML='<option value="">-- เลือกกรรมการ --</option>'+S.judges.map(j=>`<option value="${j.id}">${j.name}</option>`).join('');
+    sel.value=val;
+  });
+}
+
+// ══════════════════════════════════════════════════
+// GOOGLE SHEET SYNC
+// ══════════════════════════════════════════════════
+const WEB_APP_URL='https://script.google.com/macros/s/AKfycbzIjCjrTBBscM4SfMHJcpQ9ZvDyxiGTmVzcCW5i8cw5LEvAGNEckxKmhx4gYebBcK-i7w/exec';
+
+let syncStatus='idle';
+
+function setSyncStatus(s,msg){
+  syncStatus=s;
+  const el=document.getElementById('sync-status');
+  if(!el) return;
+  const map={
+    idle:['–',''],
+    syncing:['⏳ กำลังซิงค์...','color:var(--amber)'],
+    ok:['✅ ซิงค์แล้ว','color:var(--green)'],
+    error:['❌ ซิงค์ไม่สำเร็จ (ตรวจ Wi-Fi)','color:var(--red)']
+  };
+  const [label,style]=map[s]||map.idle;
+  el.textContent=(msg||label); el.style.cssText=style;
+}
+
+// ── JSONP GET (แก้ CORS สำหรับไฟล์ที่เปิดตรง) ──
+let _jsonpSeq=0;
+function jsonpGet(action){
+  return new Promise((resolve,reject)=>{
+    const cb='_gs'+(_jsonpSeq++);
+    const script=document.createElement('script');
+    const timer=setTimeout(()=>{
+      delete window[cb]; document.head.removeChild(script);
+      reject(new Error('timeout'));
+    },15000);
+    window[cb]=data=>{
+      clearTimeout(timer); delete window[cb];
+      document.head.removeChild(script);
+      resolve(data);
+    };
+    script.src=`${WEB_APP_URL}?action=${action}&callback=${cb}&t=${Date.now()}`;
+    script.onerror=()=>{ clearTimeout(timer); delete window[cb]; reject(new Error('script error')); };
+    document.head.appendChild(script);
+  });
+}
+
+// ── JSONP POST — ส่งข้อมูลผ่าน GET params+JSONP (แก้ CORS จาก file://) ──
+function jsonpPost(payload){
+  return new Promise((resolve,reject)=>{
+    const cb='_gsp'+(_jsonpSeq++);
+    const script=document.createElement('script');
+    const timer=setTimeout(()=>{
+      delete window[cb];
+      if(script.parentNode) script.parentNode.removeChild(script);
+      reject(new Error('timeout'));
+    },15000);
+    window[cb]=data=>{
+      clearTimeout(timer); delete window[cb];
+      if(script.parentNode) script.parentNode.removeChild(script);
+      resolve(data);
+    };
+    const params=new URLSearchParams({callback:cb});
+    Object.entries(payload).forEach(([k,v])=>{
+      params.append(k, typeof v==='object'?JSON.stringify(v):String(v));
+    });
+    script.src=`${WEB_APP_URL}?${params.toString()}&t=${Date.now()}`;
+    script.onerror=()=>{
+      clearTimeout(timer); delete window[cb];
+      if(script.parentNode) script.parentNode.removeChild(script);
+      reject(new Error('script error'));
+    };
+    document.head.appendChild(script);
+  });
+}
+
+// ── Push one score entry to Sheet ──
+async function pushScore(payload){
+  setSyncStatus('syncing');
+  try{
+    await jsonpPost({
+      action:'submitScore',
+      ...payload,
+      rawJSON:JSON.stringify(payload.rawJSON||{})
+    });
+    setSyncStatus('ok');
+    setTimeout(()=>setSyncStatus('idle'),3000);
+  }catch(e){
+    setSyncStatus('error');
+    console.error('pushScore failed',e);
+  }
+}
+
+// ── Save meta (pilots/judges/pairs) ──
+async function pushMeta(){
+  const meta={
+    pilots:S.pilots,
+    judges:S.judges,
+    activeClasses:S.activeClasses,
+    aeroPairAssign:AeroS.pairAssign
+  };
+  try{
+    await jsonpPost({
+      action:'saveMeta',
+      key:'config',
+      value:JSON.stringify(meta)
+    });
+  }catch(e){ console.warn('pushMeta failed',e); }
+}
+
+
+// ── Pull ALL scores from Sheet via JSONP ──
+async function pullAllScores(){
+  setSyncStatus('syncing');
+  try{
+    const data=await jsonpGet('getAll');
+    if(!data.rows) throw new Error('no rows');
+
+    S.scores={}; AeroS.scores={};
+    data.rows.forEach(row=>{
+      const cls=row.Class, sub=row.SubClass, round=parseInt(row.Round)||1;
+      const judgeOrPairId=String(row.JudgeOrPairID), pid=String(row.PilotID);
+      const rawScore=parseFloat(row.RawScore)||0;
+      const penaltyPct=parseFloat(row.PenaltyPct)||0;
+      const scoreType=row.ScoreType;
+      let rawJSON={};
+      try{ rawJSON=JSON.parse(row.RawJSON||'{}'); }catch(_){}
+      const penaltyId=penaltyPct===10?'p10':penaltyPct===5?'p5':'none';
+
+      if(scoreType==='aero'){
+        if(!AeroS.scores[cls]) AeroS.scores[cls]={};
+        if(!AeroS.scores[cls][judgeOrPairId]) AeroS.scores[cls][judgeOrPairId]={};
+        if(!AeroS.scores[cls][judgeOrPairId][pid]) AeroS.scores[cls][judgeOrPairId][pid]={};
+        const d={penalty:penaltyId,submitted:true};
+        Object.assign(d,rawJSON);
+        AeroS.scores[cls][judgeOrPairId][pid][round]=d;
+      } else {
+        if(!S.scores[cls]) S.scores[cls]={};
+        if(!S.scores[cls][sub]) S.scores[cls][sub]={};
+        if(!S.scores[cls][sub][judgeOrPairId]) S.scores[cls][sub][judgeOrPairId]={};
+        if(!S.scores[cls][sub][judgeOrPairId][pid]) S.scores[cls][sub][judgeOrPairId][pid]={};
+        const d={penalty:penaltyId,submitted:true};
+        if(scoreType==='basic3d') Object.assign(d,rawJSON);
+        else if(scoreType==='smack') d.wow=rawScore;
+        else d.total=rawScore;
+        S.scores[cls][sub][judgeOrPairId][pid][round]=d;
+      }
+    });
+
+    setSyncStatus('ok');
+    setTimeout(()=>setSyncStatus('idle'),3000);
+    return true;
+  }catch(e){
+    setSyncStatus('error');
+    console.error('pullAllScores failed',e);
+    return false;
+  }
+}
+
+// ── Pull meta via JSONP ──
+async function pullMeta(){
+  try{
+    const meta=await jsonpGet('getMeta');
+    const cfg=meta.config;
+    if(!cfg) return false;
+    if(cfg.pilots?.length)       S.pilots=cfg.pilots;
+    if(cfg.judges?.length)       S.judges=cfg.judges;
+    if(cfg.activeClasses?.length) S.activeClasses=cfg.activeClasses;
+    if(cfg.aeroPairAssign)       AeroS.pairAssign=cfg.aeroPairAssign;
+    return true;
+  }catch(e){ console.warn('pullMeta failed',e); return false; }
+}
+
+// ── Build payloads ──
+function buildPayload(jid,pid,cid,sid,round,scoreType){
+  const d=getScoreObj(jid,pid,cid,sid,round)||{};
+  const penaltyPct=PENALTIES.find(p=>p.id===(d.penalty||'none'))?.pct||0;
+  let raw=0,rawJSON={};
+  if(scoreType==='basic3d'){
+    BASIC3D.forEach(m=>{ rawJSON[m.id]=d[m.id]||0; });
+    raw=BASIC3D.reduce((s,m)=>s+(d[m.id]>=0?d[m.id]:0),0);
+  } else if(scoreType==='smack'){
+    raw=d.wow>=0?d.wow:0; rawJSON={wow:raw};
+  } else {
+    raw=d.total||0; rawJSON={total:raw};
+  }
+  const final=+(raw*(1-penaltyPct/100)).toFixed(4);
+  return {
+    submissionId:`${cid}|${sid}|${round}|${jid}|${pid}`,
+    cls:cid, sub:sid, round,
+    judgeOrPairId:jid,
+    judgeOrPairName:S.judges.find(j=>j.id===jid)?.name||jid,
+    pid, pname:S.pilots.find(p=>p.id===pid)?.name||pid,
+    scoreType, rawJSON, raw, penaltyPct, final
+  };
+}
+
+function buildAeroPayload(cid,pairId,pilotId,round){
+  const d=getAeroObj(cid,pairId,pilotId,round)||{};
+  const penaltyPct=PENALTIES.find(p=>p.id===(d.penalty||'none'))?.pct||0;
+  const crits=AERO_CRITERIA.filter(c=>c.pairId===pairId);
+  const rawJSON={};
+  crits.forEach(c=>{ rawJSON[c.id]=d[c.id]>=0?d[c.id]:0; });
+  const raw=crits.reduce((s,c)=>s+(d[c.id]>=0?(d[c.id]/10*c.max):0),0);
+  const final=+(raw*(1-penaltyPct/100)).toFixed(4);
+  return {
+    submissionId:`${cid}|aero|${round}|${pairId}|${pilotId}`,
+    cls:cid, sub:'c3d_aero', round,
+    judgeOrPairId:pairId,
+    judgeOrPairName:aeroPairLabel(pairId),
+    pid:pilotId, pname:S.pilots.find(p=>p.id===pilotId)?.name||pilotId,
+    scoreType:'aero', rawJSON, raw, penaltyPct, final
+  };
+}
+
+function startContest(){
+  document.querySelectorAll('#pilots-list input[type=text]').forEach((el,i)=>{
+    const pi=Math.floor(i/2); if(i%2===0) S.pilots[pi].name=el.value.trim(); else S.pilots[pi].plane=el.value.trim();
+  });
+  document.querySelectorAll('#judges-list input[type=text]').forEach((el,i)=>{ S.judges[i].name=el.value.trim(); });
+  S.pilots=S.pilots.filter(p=>p.name);
+  S.judges=S.judges.filter(j=>j.name);
+  if(S.pilots.length<2){showToast('ต้องมีนักบินอย่างน้อย 2 คน');return;}
+  if(S.judges.length<3){showToast('ต้องมีกรรมการอย่างน้อย 3 ท่าน');return;}
+  if(!S.activeClasses.length){showToast('เลือกประเภทอย่างน้อย 1 ประเภท');return;}
+  S.scores={}; S.started=true; S.bClass=CLASSES[0].id; S.bSub=null;
+  populateClassTabSelectors('basic');
+  populateClassTabSelectors('sportman');
+  populateClassTabSelectors('inter');
+  populateC3DPilots();
+  populateAeroSelectors();
+  populateSmackSelectors();
+  pushMeta();
+  renderBoard();
+  showPage('basic');
+  showToast('🚀 เริ่มการแข่งขัน!');
+}
+
+// ══════════════════════════════════════════════════
+// JUDGE SELECTORS
+// ══════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+// DEDICATED CLASS TABS: Basic / Sportsman / Intermediate
+// ══════════════════════════════════════════════════
+const CLASS_TAB_CONFIG={
+  basic:    { classId:'basic',    hasSub:true  },
+  sportman: { classId:'sportman', hasSub:false },
+  inter:    { classId:'inter',    hasSub:false },
+};
+
+function populateClassTabSelectors(tab){
+  const cfg=CLASS_TAB_CONFIG[tab];
+  if(!cfg) return;
+  const sj=document.getElementById(`${tab}-sel-judge`);
+  const sp=document.getElementById(`${tab}-sel-pilot`);
+  if(!sj) return;
+  sj.innerHTML='<option value="">-- กรรมการ --</option>'+S.judges.map(j=>`<option value="${j.id}">${j.name}</option>`).join('');
+  sp.innerHTML='<option value="">-- นักบิน --</option>'+S.pilots.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  if(cfg.hasSub){
+    const ss=document.getElementById(`${tab}-sel-sub`);
+    const c=CLASSES.find(x=>x.id===cfg.classId);
+    ss.innerHTML='<option value="">-- Sub-class --</option>'+(c?c.subs.map(s=>`<option value="${s.id}">${s.name}</option>`).join(''):'');
+  }
+}
+
+function renderClassJudgeForm(tab){
+  const cfg=CLASS_TAB_CONFIG[tab];
+  if(!cfg) return;
+  const jid=document.getElementById(`${tab}-sel-judge`).value;
+  const pid=document.getElementById(`${tab}-sel-pilot`).value;
+  const cid=cfg.classId;
+  const sid=cfg.hasSub?document.getElementById(`${tab}-sel-sub`).value:CLASSES.find(x=>x.id===cid)?.subs[0]?.id;
+  const el=document.getElementById(`${tab}-content`);
+  const emptyIcon={basic:'🛩️',sportman:'🎯',inter:'⭐'}[tab]||'✈️';
+  if(!jid||!pid||!sid){
+    el.innerHTML=`<div class="empty-state"><div class="icon">${emptyIcon}</div><p>เลือกกรรมการ${cfg.hasSub?', นักบิน และ Sub-class':' และนักบิน'}<br>เพื่อเริ่มให้คะแนน</p></div>`;
+    return;
+  }
+  const cDef=CLASSES.find(x=>x.id===cid);
+  const sDef=cDef?.subs.find(x=>x.id===sid);
+  if(!cDef||!sDef) return;
+  const round=getNextRound(jid,pid,cid,sid,sDef.rounds);
+  document.getElementById(`${tab}-flight-badge`).textContent=`ROUND ${round}`;
+  if(round>sDef.rounds){
+    el.innerHTML=`<div class="empty-state"><div class="icon">✅</div>
+      <p>ให้คะแนนครบ ${sDef.rounds} เที่ยวบินแล้ว<br><strong>${cDef.name} · ${sDef.name}</strong></p></div>`;
+    return;
+  }
+  if(sDef.type==='basic3d') buildBasic3D(jid,pid,cid,sid,round,`${tab}-content`);
+  else buildIMACForm(jid,pid,cid,sid,round,sDef,`${tab}-content`);
+}
+
+// ══════════════════════════════════════════════════
+// BUILD BASIC 3D FORM (0–10, step 0.5, + penalty)
+// ══════════════════════════════════════════════════
+function buildBasic3D(jid,pid,cid,sid,round,targetId){
+  targetId=targetId||'judge-content';
+  const existing=getScoreObj(jid,pid,cid,sid,round)||{};
+  const penKey=existing.penalty||'none';
+  let html='';
+
+  BASIC3D.forEach(m=>{
+    const cur=existing[m.id]!==undefined ? existing[m.id] : -1; // -1 = not set
+    html+=buildMnvCard(m, cur, jid, pid, cid, sid, round);
+  });
+
+  // Penalty block
+  html+=`<div class="penalty-box">
+    <div class="penalty-title">⚠️ PENALTY</div>
+    <div class="penalty-btns">`;
+  PENALTIES.forEach(pen=>{
+    html+=`<div class="pen-btn ${pen.cls} ${penKey===pen.id?'active':''}"
+      id="pen-${pen.id}-${round}"
+      onclick="setPenalty('${pen.id}','${jid}','${pid}','${cid}','${sid}',${round})">
+      ${pen.icon} ${pen.label}
+    </div>`;
+  });
+  html+=`</div>
+    <div class="pen-desc">
+      <strong style="color:var(--amber)">–5%</strong> เช่น บินเกินเวลา, ออกนอกขอบเขตเล็กน้อย &nbsp;|&nbsp;
+      <strong style="color:var(--red)">–10%</strong> เช่น ละเมิด safety line / safety zone
+    </div>
+  </div>`;
+
+  // Total bar
+  const {raw, penPct, after} = calcB3D(jid,pid,cid,sid,round);
+  html+=buildTotalBar(raw, penPct, after, round, 80);
+  html+=`<button class="btn-submit" id="sub-btn"
+    onclick="openModal('${jid}','${pid}','${cid}','${sid}',${round})"
+    ${raw<=0?'disabled':''}>📤 ส่งคะแนน Round ${round}</button>`;
+  document.getElementById(targetId).innerHTML=html;
+}
+
+function buildMnvCard(m, cur, jid, pid, cid, sid, round){
+  const notSet=(cur===-1);
+  // Integer row
+  let intRow='<div class="row-label">0–10</div><div class="score-row" style="flex:1;gap:4px">';
+  INT_STEPS.forEach(v=>{
+    const active=(!notSet && cur===v);
+    intRow+=`<button class="sbtn ${active?'active':''}"
+      onclick="setMScore('${m.id}',${v},'${jid}','${pid}','${cid}','${sid}',${round},this)">${v}</button>`;
+  });
+  intRow+='</div>';
+  // Half row
+  let halfRow='<div class="row-label">.5</div><div class="score-row" style="flex:1;gap:4px">';
+  HALF_STEPS.forEach(v=>{
+    const active=(!notSet && cur===v);
+    halfRow+=`<button class="sbtn half ${active?'active':''}"
+      onclick="setMScore('${m.id}',${v},'${jid}','${pid}','${cid}','${sid}',${round},this)">${v}</button>`;
+  });
+  halfRow+='</div>';
+
+  const dispVal = notSet?'–':cur.toFixed(1);
+  const scored  = !notSet && cur>0;
+  return `<div class="mnv-card ${scored?'scored':''}" id="mc-${m.id}-${round}">
+    <div class="mnv-head">
+      <div class="mnv-num">${m.id.slice(1)}</div>
+      <div><div class="mnv-name">${m.name}</div><div class="mnv-tip">${m.tip}</div></div>
+      <div class="mnv-disp" id="disp-${m.id}-${round}">${dispVal}</div>
+    </div>
+    <div class="score-grid">
+      <div style="display:flex;gap:4px;align-items:center">${intRow}</div>
+      <div style="display:flex;gap:4px;align-items:center">${halfRow}</div>
+    </div>
+  </div>`;
+}
+
+function buildTotalBar(raw, penPct, after, round, maxScore){
+  const penLabel=penPct>0?`<span class="pen-tag">−${penPct}%</span>`:
+    `<span style="color:var(--green)">ไม่มี Penalty</span>`;
+  return `<div class="total-bar">
+    <div class="total-inner">
+      <div>
+        <div class="total-label">คะแนนหลัง Penalty · ROUND ${round}</div>
+        <div class="total-max">/ ${maxScore} คะแนน</div>
+      </div>
+      <div class="total-val" id="tot-after-${round}">${after.toFixed(2)}</div>
+    </div>
+    <div class="total-breakdown">
+      <div>คะแนนดิบ: <span id="tot-raw-${round}">${raw.toFixed(1)}</span></div>
+      <div>Penalty: <span id="tot-pen-${round}">${penLabel}</span></div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════
+// BUILD IMAC FORM
+// ══════════════════════════════════════════════════
+function buildIMACForm(jid,pid,cid,sid,round,sDef,targetId){
+  targetId=targetId||'judge-content';
+  const existing=getScoreObj(jid,pid,cid,sid,round)||{};
+  const cur=existing.total!=null?existing.total:'';
+  const penKey=existing.penalty||'none';
+  const penPct=PENALTIES.find(p=>p.id===penKey)?.pct||0;
+  const after=cur?+(parseFloat(cur)*(1-penPct/100)).toFixed(3):0;
+
+  let penBtns='';
+  PENALTIES.forEach(pen=>{
+    penBtns+=`<div class="pen-btn ${pen.cls} ${penKey===pen.id?'active':''}"
+      id="pen-${pen.id}-${round}"
+      onclick="setPenalty('${pen.id}','${jid}','${pid}','${cid}','${sid}',${round})">${pen.icon} ${pen.label}</div>`;
+  });
+
+  document.getElementById(targetId).innerHTML=`
+    <div class="section">
+      <div class="sec-title" style="color:var(--amber)">${sDef.name} · Round ${round}</div>
+      <p style="font-size:12px;color:var(--dim);margin-bottom:16px">${sDef.desc}</p>
+      <div class="imac-wrap">
+        <label class="lbl" style="margin-top:0">คะแนนรวม (จากใบ score sheet)</label>
+        <input type="number" id="imac-in" min="0" max="9999" step="0.001" value="${cur}" placeholder="0.000"
+          oninput="syncIMACScore('${jid}','${pid}','${cid}','${sid}',${round},this.value)">
+        <div class="imac-hint">คะแนนจะถูกถ่วงน้ำหนักกับนักบินคนอื่นในประเภทเดียวกัน</div>
+      </div>
+    </div>
+    <div class="penalty-box">
+      <div class="penalty-title">⚠️ PENALTY</div>
+      <div class="penalty-btns">${penBtns}</div>
+      <div class="pen-desc">
+        <strong style="color:var(--amber)">–5%</strong> บินเกินเวลา, ออกนอกขอบเขตเล็กน้อย &nbsp;|&nbsp;
+        <strong style="color:var(--red)">–10%</strong> ละเมิด safety line / safety zone
+      </div>
+    </div>
+    <div class="total-bar">
+      <div class="total-inner">
+        <div><div class="total-label">คะแนนหลัง Penalty · ROUND ${round}</div><div class="total-max">${sDef.maxPer?'/ '+sDef.maxPer:''}</div></div>
+        <div class="total-val" id="tot-after-${round}">${after.toFixed(3)}</div>
+      </div>
+      <div class="total-breakdown">
+        <div>คะแนนดิบ: <span id="tot-raw-${round}">${cur||0}</span></div>
+        <div>Penalty: <span id="tot-pen-${round}">${penPct>0?`<span class="pen-tag">−${penPct}%</span>`:'<span style="color:var(--green)">ไม่มี</span>'}</span></div>
+      </div>
+    </div>
+    <button class="btn-submit" id="sub-btn"
+      onclick="openModal('${jid}','${pid}','${cid}','${sid}',${round})"
+      ${!cur?'disabled':''}>📤 ส่งคะแนน Round ${round}</button>`;
+}
+
+// ── SMACK FORM (single criterion: Wow Factor, 0–10 step 0.5) ──
+// ══════════════════════════════════════════════════
+// 3D CLASS TAB CONTROLLER (Aeromusical / Smack merged tab)
+// ══════════════════════════════════════════════════
+function populateC3DPilots(){
+  const spl=document.getElementById('c3d-sel-pilot');
+  if(!spl) return;
+  spl.innerHTML='<option value="">-- นักบิน --</option>'+S.pilots.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+}
+
+function onC3DSubChange(){
+  const sub=document.getElementById('c3d-sel-sub').value;
+  const pairGrp=document.getElementById('c3d-pair-grp');
+  const judgeGrp=document.getElementById('c3d-judge-grp');
+  if(sub==='aero'){
+    pairGrp.style.display='';
+    judgeGrp.style.display='none';
+  } else {
+    pairGrp.style.display='none';
+    judgeGrp.style.display='';
+  }
+  onC3DSelectionChange();
+}
+
+function onC3DSelectionChange(){
+  const sub=document.getElementById('c3d-sel-sub').value;
+  if(sub==='aero') renderAeroForm();
+  else renderSmackForm();
+}
+
+// ══════════════════════════════════════════════════
+// 3D SMACK MODULE
+// ══════════════════════════════════════════════════
+const SMACK_SUB_ID='c3d_smack';
+const SMACK_TARGET_CLASSES=['class3d'];
+
+function populateSmackSelectors(){
+  const sj=document.getElementById('smack-sel-judge');
+  if(!sj) return;
+  sj.innerHTML='<option value="">-- กรรมการ --</option>'+S.judges.map(j=>`<option value="${j.id}">${j.name}</option>`).join('');
+}
+
+function renderSmackForm(){
+  const jid=document.getElementById('smack-sel-judge').value;
+  const pid=document.getElementById('c3d-sel-pilot').value;
+  const cid=SMACK_TARGET_CLASSES[0];
+  const el=document.getElementById('c3d-content');
+  if(!jid||!pid||!cid){
+    el.innerHTML='<div class="empty-state"><div class="icon">🔥</div><p>เลือกกรรมการ และนักบิน<br>เพื่อเริ่มให้คะแนน 3D Smack (Wow Factor)</p></div>';
+    return;
+  }
+  const cDef=CLASSES.find(x=>x.id===cid);
+  const sDef=cDef?.subs.find(x=>x.id===SMACK_SUB_ID);
+  if(!cDef||!sDef){ el.innerHTML='<div class="empty-state"><div class="icon">🔥</div><p>ประเภทนี้ไม่มี Sub-class Smack</p></div>'; return; }
+  const sid=SMACK_SUB_ID;
+  const round=getNextRound(jid,pid,cid,sid,sDef.rounds);
+  document.getElementById('c3d-flight-badge').textContent=`ROUND ${round}`;
+  if(round>sDef.rounds){
+    el.innerHTML=`<div class="empty-state"><div class="icon">✅</div><p>ให้คะแนนครบ ${sDef.rounds} เที่ยวบินแล้ว<br><strong>${cDef.name} · Smack</strong></p></div>`;
+    return;
+  }
+  buildSmackForm(jid,pid,cid,sid,round,sDef);
+}
+
+function buildSmackForm(jid,pid,cid,sid,round,sDef){
+  const existing=getScoreObj(jid,pid,cid,sid,round)||{};
+  const cur=existing.wow!==undefined?existing.wow:-1;
+  const penKey=existing.penalty||'none';
+
+  const notSet=(cur===-1);
+  let intRow='<div class="row-label">0–10</div><div class="score-row" style="flex:1;gap:4px">';
+  INT_STEPS.forEach(v=>{
+    const active=(!notSet&&cur===v);
+    intRow+=`<button class="sbtn ${active?'active':''}" onclick="setSmackScore(${v},'${jid}','${pid}','${cid}','${sid}',${round},this)">${v}</button>`;
+  });
+  intRow+='</div>';
+  let halfRow='<div class="row-label">.5</div><div class="score-row" style="flex:1;gap:4px">';
+  HALF_STEPS.forEach(v=>{
+    const active=(!notSet&&cur===v);
+    halfRow+=`<button class="sbtn half ${active?'active':''}" onclick="setSmackScore(${v},'${jid}','${pid}','${cid}','${sid}',${round},this)">${v}</button>`;
+  });
+  halfRow+='</div>';
+
+  let penBtns='';
+  PENALTIES.forEach(pen=>{
+    penBtns+=`<div class="pen-btn ${pen.cls} ${penKey===pen.id?'active':''}"
+      id="smack-pen-${pen.id}-${round}"
+      onclick="setSmackPenalty('${pen.id}','${jid}','${pid}','${cid}','${sid}',${round})">${pen.icon} ${pen.label}</div>`;
+  });
+
+  const {raw,after,penPct}=calcSmack(jid,pid,cid,sid,round);
+  document.getElementById('c3d-content').innerHTML=`
+    <div class="mnv-card ${cur>0?'scored':''}" id="smack-mc-wow-${round}">
+      <div class="mnv-head">
+        <div class="mnv-num">🔥</div>
+        <div><div class="mnv-name">Wow Factor</div><div class="mnv-tip">ความหวาดเสียว ความบันเทิง และความประทับใจโดยรวม</div></div>
+        <div class="mnv-disp" id="smack-disp-wow-${round}">${notSet?'–':cur.toFixed(1)}</div>
+      </div>
+      <div class="score-grid">
+        <div style="display:flex;gap:4px;align-items:center">${intRow}</div>
+        <div style="display:flex;gap:4px;align-items:center">${halfRow}</div>
+      </div>
+    </div>
+    <div class="penalty-box">
+      <div class="penalty-title">⚠️ PENALTY</div>
+      <div class="penalty-btns">${penBtns}</div>
+      <div class="pen-desc">
+        <strong style="color:var(--amber)">–5%</strong> เช่น บินเกินเวลา, ออกนอกขอบเขตเล็กน้อย &nbsp;|&nbsp;
+        <strong style="color:var(--red)">–10%</strong> เช่น ละเมิด safety line / safety zone
+      </div>
+    </div>
+    <div class="total-bar">
+      <div class="total-inner">
+        <div><div class="total-label">คะแนนหลัง Penalty · ROUND ${round}</div><div class="total-max">/ 10 คะแนน</div></div>
+        <div class="total-val" id="smack-tot-after-${round}">${after.toFixed(2)}</div>
+      </div>
+      <div class="total-breakdown">
+        <div>คะแนนดิบ: <span id="smack-tot-raw-${round}">${raw.toFixed(1)}</span></div>
+        <div>Penalty: <span id="smack-tot-pen-${round}">${penPct>0?`<span class="pen-tag">−${penPct}%</span>`:'<span style="color:var(--green)">ไม่มี</span>'}</span></div>
+      </div>
+    </div>
+    <button class="btn-submit" id="smack-sub-btn"
+      onclick="openSmackModal('${jid}','${pid}','${cid}','${sid}',${round})" ${raw<=0?'disabled':''}>
+      📤 ส่งคะแนน Round ${round}
+    </button>`;
+}
+
+function setSmackScore(val,jid,pid,cid,sid,round,btn){
+  ensureObj(jid,pid,cid,sid,round);
+  const d=S.scores[cid][sid][jid][pid][round];
+  d.wow=(d.wow===val)?-1:val;
+  const cur=d.wow;
+  const card=document.getElementById(`smack-mc-wow-${round}`);
+  if(card){
+    card.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('active'));
+    if(cur>=0){
+      card.querySelectorAll('.sbtn').forEach(b=>{ if(parseFloat(b.textContent)===cur) b.classList.add('active'); });
+      card.classList.add('scored');
+    } else card.classList.remove('scored');
+  }
+  const disp=document.getElementById(`smack-disp-wow-${round}`);
+  if(disp) disp.textContent=cur>=0?cur.toFixed(1):'–';
+  refreshSmackTotals(jid,pid,cid,sid,round);
+}
+
+function setSmackPenalty(penId,jid,pid,cid,sid,round){
+  ensureObj(jid,pid,cid,sid,round);
+  S.scores[cid][sid][jid][pid][round].penalty=penId;
+  PENALTIES.forEach(p=>{
+    const btn=document.getElementById(`smack-pen-${p.id}-${round}`);
+    if(btn) btn.classList.toggle('active',p.id===penId);
+  });
+  refreshSmackTotals(jid,pid,cid,sid,round);
+}
+
+function refreshSmackTotals(jid,pid,cid,sid,round){
+  const {raw,after,penPct}=calcSmack(jid,pid,cid,sid,round);
+  const ta=document.getElementById(`smack-tot-after-${round}`); if(ta) ta.textContent=after.toFixed(2);
+  const tr=document.getElementById(`smack-tot-raw-${round}`); if(tr) tr.textContent=raw.toFixed(1);
+  const tp=document.getElementById(`smack-tot-pen-${round}`);
+  if(tp) tp.innerHTML=penPct>0?`<span class="pen-tag">−${penPct}%</span>`:'<span style="color:var(--green)">ไม่มี</span>';
+  const sb=document.getElementById('smack-sub-btn'); if(sb) sb.disabled=(raw<=0);
+}
+
+function calcSmack(jid,pid,cid,sid,round){
+  const d=getScoreObj(jid,pid,cid,sid,round);
+  const raw=(d&&d.wow>=0)?d.wow:0;
+  const penPct=PENALTIES.find(p=>p.id===(d?.penalty||'none'))?.pct||0;
+  const after=+(raw*(1-penPct/100)).toFixed(2);
+  return {raw,after,penPct};
+}
+
+let _smackP=null;
+function openSmackModal(jid,pid,cid,sid,round){
+  const cDef=CLASSES.find(x=>x.id===cid);
+  const {raw,after,penPct}=calcSmack(jid,pid,cid,sid,round);
+  const penLabel=penPct>0?`<span style="color:var(--red)">−${penPct}%</span>`:`<span style="color:var(--green)">ไม่มี</span>`;
+  const pname=S.pilots.find(p=>p.id===pid)?.name||'?';
+  const jname=S.judges.find(j=>j.id===jid)?.name||'?';
+  document.getElementById('confirm-text').innerHTML=
+    `<strong>${jname}</strong> → <strong>${pname}</strong><br>
+     ${cDef?.name||''} · Smack (Wow Factor) · Round ${round}<br>
+     คะแนนดิบ: <strong>${raw.toFixed(1)}</strong> | Penalty: ${penLabel}<br>
+     <strong style="color:var(--accent);font-size:22px">${after.toFixed(2)}</strong> คะแนน / 10<br><br>ยืนยัน?`;
+  _smackP={jid,pid,cid,sid,round};
+  document.getElementById('confirm-modal').classList.add('open');
+}
+
+// ══════════════════════════════════════════════════
+// SCORE SETTERS
+// ══════════════════════════════════════════════════
+function setMScore(key,val,jid,pid,cid,sid,round,btn){
+  ensureObj(jid,pid,cid,sid,round);
+  const d=S.scores[cid][sid][jid][pid][round];
+  d[key]=(d[key]===val)?-1:val;   // -1 = cleared
+  const cur=d[key];
+
+  // update button states across both rows
+  const card=document.getElementById(`mc-${key}-${round}`);
+  if(card){
+    card.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('active'));
+    if(cur>=0){
+      card.querySelectorAll('.sbtn').forEach(b=>{
+        if(parseFloat(b.textContent)===cur) b.classList.add('active');
+      });
+      card.classList.add('scored');
+    } else {
+      card.classList.remove('scored');
+    }
+  }
+  const disp=document.getElementById(`disp-${key}-${round}`);
+  if(disp) disp.textContent=cur>=0?cur.toFixed(1):'–';
+  refreshTotals(jid,pid,cid,sid,round);
+}
+
+function setPenalty(penId,jid,pid,cid,sid,round){
+  ensureObj(jid,pid,cid,sid,round);
+  S.scores[cid][sid][jid][pid][round].penalty=penId;
+  PENALTIES.forEach(p=>{
+    const btn=document.getElementById(`pen-${p.id}-${round}`);
+    if(btn) btn.classList.toggle('active',p.id===penId);
+  });
+  refreshTotals(jid,pid,cid,sid,round);
+}
+
+function syncIMACScore(jid,pid,cid,sid,round,val){
+  ensureObj(jid,pid,cid,sid,round);
+  const raw=parseFloat(val)||0;
+  S.scores[cid][sid][jid][pid][round].total=raw;
+  const sb=document.getElementById('sub-btn');if(sb) sb.disabled=(raw<=0);
+  refreshTotals(jid,pid,cid,sid,round,raw);
+}
+
+function refreshTotals(jid,pid,cid,sid,round,imacRaw){
+  const sDef=CLASSES.find(x=>x.id===cid)?.subs.find(x=>x.id===sid);
+  if(!sDef) return;
+  let raw,after,penPct;
+  if(sDef.type==='basic3d'){
+    const r=calcB3D(jid,pid,cid,sid,round);
+    raw=r.raw; after=r.after; penPct=r.penPct;
+    const sb=document.getElementById('sub-btn');if(sb) sb.disabled=(raw<=0);
+  } else if(sDef.type==='smack'){
+    const r=calcSmack(jid,pid,cid,sid,round);
+    raw=r.raw; after=r.after; penPct=r.penPct;
+    const sb=document.getElementById('sub-btn');if(sb) sb.disabled=(raw<=0);
+  } else {
+    const d=getScoreObj(jid,pid,cid,sid,round);
+    raw=imacRaw!==undefined?imacRaw:(d?.total||0);
+    penPct=PENALTIES.find(p=>p.id===(d?.penalty||'none'))?.pct||0;
+    after=+(raw*(1-penPct/100)).toFixed(3);
+  }
+  const ta=document.getElementById(`tot-after-${round}`);
+  const tr=document.getElementById(`tot-raw-${round}`);
+  const tp=document.getElementById(`tot-pen-${round}`);
+  if(ta) ta.textContent=after.toFixed(sDef.type==='imac'?3:2);
+  if(tr) tr.textContent=sDef.type==='imac'?raw:raw.toFixed(1);
+  if(tp) tp.innerHTML=penPct>0?`<span class="pen-tag">−${penPct}%</span>`:'<span style="color:var(--green)">ไม่มี</span>';
+}
+
+function calcB3D(jid,pid,cid,sid,round){
+  const d=getScoreObj(jid,pid,cid,sid,round);
+  const raw=d?BASIC3D.reduce((s,m)=>{ const v=d[m.id]; return s+(v>=0?v:0); },0):0;
+  const penPct=PENALTIES.find(p=>p.id===(d?.penalty||'none'))?.pct||0;
+  const after=+(raw*(1-penPct/100)).toFixed(2);
+  return {raw,penPct,after};
+}
+
+// ══════════════════════════════════════════════════
+// SCORE STORE HELPERS
+// ══════════════════════════════════════════════════
+function ensureObj(jid,pid,cid,sid,round){
+  if(!S.scores[cid]) S.scores[cid]={};
+  if(!S.scores[cid][sid]) S.scores[cid][sid]={};
+  if(!S.scores[cid][sid][jid]) S.scores[cid][sid][jid]={};
+  if(!S.scores[cid][sid][jid][pid]) S.scores[cid][sid][jid][pid]={};
+  if(!S.scores[cid][sid][jid][pid][round]) S.scores[cid][sid][jid][pid][round]={penalty:'none',submitted:false};
+}
+function getScoreObj(jid,pid,cid,sid,round){
+  return S.scores[cid]?.[sid]?.[jid]?.[pid]?.[round]||null;
+}
+function getNextRound(jid,pid,cid,sid,max){
+  for(let r=1;r<=max;r++){const d=getScoreObj(jid,pid,cid,sid,r);if(!d||!d.submitted) return r;}
+  return max+1;
+}
+
+// Final submitted score (after penalty)
+function getFinal(jid,pid,cid,sid,round){
+  const d=getScoreObj(jid,pid,cid,sid,round);
+  if(!d||!d.submitted) return null;
+  const sDef=CLASSES.find(x=>x.id===cid)?.subs.find(x=>x.id===sid);
+  const penPct=PENALTIES.find(p=>p.id===(d.penalty||'none'))?.pct||0;
+  if(sDef?.type==='basic3d'){
+    const raw=BASIC3D.reduce((s,m)=>{const v=d[m.id];return s+(v>=0?v:0);},0);
+    return +(raw*(1-penPct/100)).toFixed(4);
+  }
+  if(sDef?.type==='smack'){
+    const raw=d.wow>=0?d.wow:0;
+    return +(raw*(1-penPct/100)).toFixed(4);
+  }
+  return +((d.total||0)*(1-penPct/100)).toFixed(4);
+}
+
+// ══════════════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════════════
+let _p=null;
+function openModal(jid,pid,cid,sid,round){
+  const cDef=CLASSES.find(x=>x.id===cid), sDef=cDef?.subs.find(x=>x.id===sid);
+  const d=getScoreObj(jid,pid,cid,sid,round);
+  let raw,after,penPct,penLabel;
+  if(sDef?.type==='basic3d'){
+    const r=calcB3D(jid,pid,cid,sid,round); raw=r.raw; after=r.after; penPct=r.penPct;
+  } else if(sDef?.type==='smack'){
+    const r=calcSmack(jid,pid,cid,sid,round); raw=r.raw; after=r.after; penPct=r.penPct;
+  } else {
+    raw=d?.total||0; penPct=PENALTIES.find(p=>p.id===(d?.penalty||'none'))?.pct||0;
+    after=+(raw*(1-penPct/100)).toFixed(3);
+  }
+  penLabel=penPct>0?`<span style="color:var(--red)">−${penPct}%</span>`:`<span style="color:var(--green)">ไม่มี</span>`;
+  const pname=S.pilots.find(p=>p.id===pid)?.name||'?';
+  const jname=S.judges.find(j=>j.id===jid)?.name||'?';
+  document.getElementById('confirm-text').innerHTML=
+    `<strong>${jname}</strong> → <strong>${pname}</strong><br>
+     ${cDef?.name} · ${sDef?.name} · Round ${round}<br>
+     คะแนนดิบ: <strong>${typeof raw==='number'?raw.toFixed(1):raw}</strong> | Penalty: ${penLabel}<br>
+     <strong style="color:var(--accent);font-size:22px">${typeof after==='number'?after.toFixed(2):after}</strong> คะแนน${sDef?.maxPer?' / '+sDef.maxPer:''}<br><br>ยืนยัน?`;
+  _p={jid,pid,cid,sid,round};
+  document.getElementById('confirm-modal').classList.add('open');
+}
+function closeModal(){document.getElementById('confirm-modal').classList.remove('open');_p=null;_aeroP=null;_smackP=null;}
+function confirmSubmit(){
+  if(_aeroP){
+    const {cid,pid,pilotId,round}=_aeroP;
+    ensureAeroObj(cid,pid,pilotId,round);
+    AeroS.scores[cid][pid][pilotId][round].submitted=true;
+    pushScore(buildAeroPayload(cid,pid,pilotId,round));
+    closeModal(); renderAeroForm(); renderBoard(); showToast('✅ ส่งคะแนนแล้ว!'); updateTs();
+    return;
+  }
+  if(_smackP){
+    const {jid,pid,cid,sid,round}=_smackP;
+    ensureObj(jid,pid,cid,sid,round);
+    S.scores[cid][sid][jid][pid][round].submitted=true;
+    pushScore(buildPayload(jid,pid,cid,sid,round,'smack'));
+    closeModal(); renderSmackForm(); renderBoard(); showToast('✅ ส่งคะแนนแล้ว!'); updateTs();
+    return;
+  }
+  if(!_p) return;
+  const {jid,pid,cid,sid,round}=_p;
+  ensureObj(jid,pid,cid,sid,round);
+  S.scores[cid][sid][jid][pid][round].submitted=true;
+  const sDef=CLASSES.find(x=>x.id===cid)?.subs.find(x=>x.id===sid);
+  pushScore(buildPayload(jid,pid,cid,sid,round,sDef?.type||'imac'));
+  closeModal(); renderJudgeForm(); renderBoard(); showToast('✅ ส่งคะแนนแล้ว!'); updateTs();
+}
+
+// ══════════════════════════════════════════════════
+// SCOREBOARD
+// ══════════════════════════════════════════════════
+function renderBoardClassTabs(){
+  document.getElementById('board-class-tabs').innerHTML=CLASSES.map(c=>{
+    const on=S.bClass===c.id;
+    return `<div class="class-tab ${on?'active':''}"
+      style="${on?'color:'+c.color+';border-color:'+c.color+';background:'+c.color+'18':''}"
+      onclick="setBClass('${c.id}')">${c.name}</div>`;
+  }).join('');
+}
+function setBClass(cid){S.bClass=cid;S.bSub=null;renderBoard();}
+function setBSub(sid){S.bSub=sid;renderBoard();}
+
+function renderBoardSubTabs(cDef){
+  const el=document.getElementById('board-sub-tabs');
+  if(!cDef?.combine||cDef.subs.length<=1){el.innerHTML='';return;}
+  const allLabel=cDef.combine==='best'?'🏆 Best Flight เฉลี่ยรวม':'🏆 รวมทุก sub-class';
+  let h=`<div class="sub-tab ${S.bSub===null?'active':''}" onclick="setBSub(null)">${allLabel}</div>`;
+  cDef.subs.forEach(s=>{ h+=`<div class="sub-tab ${S.bSub===s.id?'active':''}" onclick="setBSub('${s.id}')">${s.name}</div>`; });
+  el.innerHTML=h;
+}
+
+function renderBoard(){
+  if(!S.started) return;
+  renderBoardClassTabs();
+  const cDef=CLASSES.find(x=>x.id===S.bClass);
+  renderBoardSubTabs(cDef);
+  const bc=document.getElementById('board-content');
+  if(!cDef) return;
+
+  const results=S.pilots.map(pilot=>({pilot,displayScore:getPilotDisplay(pilot.id,cDef)}));
+  if(!results.some(r=>r.displayScore>0)){
+    bc.innerHTML='<div class="empty-state"><div class="icon">⏳</div><p>รอกรรมการให้คะแนน...</p></div>';
+    return;
+  }
+  results.sort((a,b)=>b.displayScore-a.displayScore);
+  const maxR=results[0]?.displayScore||1;
+  results.forEach((r,i)=>{r.rank=i+1;r.weighted=maxR>0?+(r.displayScore/maxR*1000).toFixed(1):0;});
+
+  let html='<div class="podium-row">';
+  results.slice(0,Math.min(3,results.length)).forEach(r=>{
+    const rc=r.rank<=3?`rank-${r.rank}`:'';
+    html+=`<div class="podium-card ${rc}">
+      <div class="pd-rank">${r.rank===1?'🥇':r.rank===2?'🥈':'🥉'}</div>
+      <div class="pd-pilot">${r.pilot.name}</div>
+      <div class="pd-plane">${r.pilot.plane||'–'}</div>
+      <div class="pd-score">${r.displayScore.toFixed(2)}<span> pts</span></div>
+      <div class="pd-wt">ถ่วงน้ำหนัก <em>${r.weighted.toFixed(1)}</em> / 1000</div>
+    </div>`;
+  });
+  html+='</div>';
+
+  const subLabel=S.bSub?cDef.subs.find(x=>x.id===S.bSub)?.name:(cDef.combine==='best'?'Best Flight เฉลี่ยรวม':'รวมทุก sub-class');
+  const aeroView=S.bSub&&isAeroSub(S.bSub);
+  const cols=aeroView?AERO_PAIRS.map(p=>`PAIR ${p}`):S.judges.map(j=>j.name);
+  html+=`<div class="stbl-wrap"><table class="stbl"><thead><tr>
+    <th>#</th><th>นักบิน</th>
+    ${cols.map(c=>`<th>${c}<br><small style="font-weight:400">(เฉลี่ยหลัง pen.)</small></th>`).join('')}
+    <th>เฉลี่ยรวม<br><small>${subLabel}</small></th>
+    <th>ถ่วงน้ำหนัก<br>/ 1000</th>
+  </tr></thead><tbody>`;
+  results.forEach(r=>{
+    const rk=['rk1','rk2','rk3'][r.rank-1]||'rkn';
+    const dataCells=aeroView
+      ? AERO_PAIRS.map(p=>{const v=getAeroPairView(p,r.pilot.id,cDef.id,cDef);return`<td>${v!==null?`<span class="jsm">${v.toFixed(2)}</span>`:`<span class="jsm pend">–</span>`}</td>`}).join('')
+      : S.judges.map(j=>{const v=getJudgeView(j.id,r.pilot.id,cDef);return`<td>${v!==null?`<span class="jsm">${v.toFixed(2)}</span>`:`<span class="jsm pend">–</span>`}</td>`}).join('');
+    html+=`<tr>
+      <td><span class="rk ${rk}">${r.rank}</span></td>
+      <td><div class="pilot-cell">${r.pilot.name}</div><div class="plane-cell">${r.pilot.plane||'–'}</div></td>
+      ${dataCells}
+      <td><div class="mono">${r.displayScore.toFixed(2)}</div></td>
+      <td><div class="wt-score">${r.weighted.toFixed(1)}</div></td>
+    </tr>`;
+  });
+  html+=`</tbody></table></div>`;
+  bc.innerHTML=html;
+}
+
+function getPilotDisplay(pid,cDef){
+  if(S.bSub) return subBestScore(pid,cDef.id,S.bSub,cDef.subs.find(x=>x.id===S.bSub))??0;
+  if(cDef.combine==='best'){
+    const vals=cDef.subs.map(s=>subBestScore(pid,cDef.id,s.id,s)).filter(v=>v!==null);
+    return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+  }
+  if(!cDef.combine) return avgJudgesForSub(pid,cDef.id,cDef.subs[0].id,cDef.subs[0])??0;
+  const vals=cDef.subs.map(s=>avgJudgesForSub(pid,cDef.id,s.id,s)).filter(v=>v!==null);
+  return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+}
+
+// Best-flight score for a sub-class: for each round compute the round's
+// aggregate score (avg across pairs for aero, avg across judges for smack/others),
+// then take the MAX across rounds.
+function subBestScore(pid,cid,sid,sDef){
+  if(!sDef) return null;
+  const roundScores=[];
+  for(let r=1;r<=sDef.rounds;r++){
+    let v=null;
+    if(isAeroSub(sid)) v=aeroRoundScore(cid,pid,r);
+    else v=judgeRoundScore(cid,pid,sid,r);
+    if(v!==null) roundScores.push(v);
+  }
+  return roundScores.length?Math.max(...roundScores):null;
+}
+
+// Average across the 3 pairs for one specific round (Aeromusical)
+function aeroRoundScore(cid,pid,round){
+  const pv=AERO_PAIRS.map(pair=>getAeroFinal(cid,pair,pid,round)).filter(v=>v!==null);
+  return pv.length?pv.reduce((a,b)=>a+b,0)/pv.length:null;
+}
+
+// Average across all judges for one specific round (Smack / IMAC / Basic3D)
+function judgeRoundScore(cid,pid,sid,round){
+  const jv=S.judges.map(j=>getFinal(j.id,pid,cid,sid,round)).filter(v=>v!==null);
+  return jv.length?jv.reduce((a,b)=>a+b,0)/jv.length:null;
+}
+
+const AERO_SUB_IDS=['c3d_aero'];
+
+function isAeroSub(sid){ return AERO_SUB_IDS.includes(sid); }
+
+function avgAeroForPilot(cid,pid){
+  // average of the 3 pairs' round-averages (used outside best-flight contexts)
+  const pv=AERO_PAIRS.map(pair=>{
+    const rv=[];
+    for(let r=1;r<=AERO_ROUNDS;r++){ const v=getAeroFinal(cid,pair,pid,r); if(v!==null) rv.push(v); }
+    return rv.length?rv.reduce((a,b)=>a+b,0)/rv.length:null;
+  }).filter(v=>v!==null);
+  return pv.length?pv.reduce((a,b)=>a+b,0)/pv.length:null;
+}
+
+function avgJudgesForSub(pid,cid,sid,sDef){
+  if(!sDef) return null;
+  if(isAeroSub(sid)) return avgAeroForPilot(cid,pid);
+  const jv=S.judges.map(j=>{
+    const rv=[];
+    for(let r=1;r<=sDef.rounds;r++){const v=getFinal(j.id,pid,cid,sid,r);if(v!==null)rv.push(v);}
+    return rv.length?rv.reduce((a,b)=>a+b,0)/rv.length:null;
+  }).filter(v=>v!==null);
+  return jv.length?jv.reduce((a,b)=>a+b,0)/jv.length:null;
+}
+
+function getJudgeView(jid,pid,cDef){
+  const getAvg=(sid,sDef)=>{
+    if(isAeroSub(sid)) return null; // aero handled by pair columns, not per-judge
+    if(cDef.combine==='best'){
+      // best-flight: show this judge's score in the best-performing round only
+      let best=null,bestRound=null;
+      for(let r=1;r<=sDef.rounds;r++){
+        const roundAgg=judgeRoundScore(cDef.id,pid,sid,r);
+        if(roundAgg!==null && (best===null||roundAgg>best)){ best=roundAgg; bestRound=r; }
+      }
+      if(bestRound===null) return null;
+      return getFinal(jid,pid,cDef.id,sid,bestRound);
+    }
+    const rv=[];
+    for(let r=1;r<=sDef.rounds;r++){const v=getFinal(jid,pid,cDef.id,sid,r);if(v!==null)rv.push(v);}
+    return rv.length?rv.reduce((a,b)=>a+b,0)/rv.length:null;
+  };
+  if(S.bSub){const s=cDef.subs.find(x=>x.id===S.bSub);return s?getAvg(s.id,s):null;}
+  if(!cDef.combine) return getAvg(cDef.subs[0].id,cDef.subs[0]);
+  const sv=cDef.subs.filter(s=>!isAeroSub(s.id)).map(s=>getAvg(s.id,s)).filter(v=>v!==null);
+  return sv.length?sv.reduce((a,b)=>a+b,0)/sv.length:null;
+}
+
+function getAeroPairView(pair,pid,cid,cDef){
+  if(cDef && cDef.combine==='best'){
+    // show pair's score in whichever round produced the best aggregate
+    let best=null,bestRound=null;
+    for(let r=1;r<=AERO_ROUNDS;r++){
+      const roundAgg=aeroRoundScore(cid,pid,r);
+      if(roundAgg!==null && (best===null||roundAgg>best)){ best=roundAgg; bestRound=r; }
+    }
+    if(bestRound===null) return null;
+    return getAeroFinal(cid,pair,pid,bestRound);
+  }
+  const rv=[];
+  for(let r=1;r<=AERO_ROUNDS;r++){ const v=getAeroFinal(cid,pair,pid,r); if(v!==null) rv.push(v); }
+  return rv.length?rv.reduce((a,b)=>a+b,0)/rv.length:null;
+}
+
+// ══════════════════════════════════════════════════
+// 3D AEROMUSICAL MODULE
+// ══════════════════════════════════════════════════
+const AERO_CRITERIA = [
+  { id:'flightarea', name:'Use of total flight area',         th:'บินทั่วท้องฟ้า สูงต่ำใกล้ไกล เต็มจอ',                                    max:20, pairId:'A' },
+  { id:'risk',       name:'Level of risk',                    th:'ความเสี่ยงในการบินต่ำ',                                                 max:10, pairId:'A' },
+  { id:'complexity', name:'Original and Complexity',          th:'ความเร็วในการบิน เร็ว ช้า ผสมผสาน และท่าไม่ซ้ำ',                         max:10, pairId:'B' },
+  { id:'precision',  name:'Precision',                        th:'ความแม่นยำ เช่น การโรลและสแนปโรล',                                       max:20, pairId:'B' },
+  { id:'artistic',   name:'Artistic impression & presentation',th:'ความเข้าจังหวะเพลง อารมณ์เพลง ความประทับใจ และการใช้ smoke',            max:30, pairId:'C' },
+  { id:'choreo',     name:'Choreography',                     th:'ความต่อเนื่องในท่าบิน และความเนียนในการต่อท่า (ห้ามสุ่มท่า)',           max:30, pairId:'C' },
+];
+const AERO_PAIRS=['A','B','C'];
+const AERO_ROUNDS=2; // 3D Aeromusical – 2 เที่ยวบิน (per spec)
+const AERO_TARGET_CLASSES=['class3d']; // sub-class "Aeromusical" lives under this
+
+let AeroS={
+  pairAssign:{A:[null,null],B:[null,null],C:[null,null]}, // judge ids per pair
+  scores:{}, // [classId][pairId][pilotId][round] = {raw, penalty, submitted}
+};
+
+function renderAeroPairSetup(){
+  const el=document.getElementById('aero-pair-grid');
+  if(!el) return;
+  el.innerHTML=AERO_PAIRS.map(pid=>{
+    const crits=AERO_CRITERIA.filter(c=>c.pairId===pid);
+    const opts=()=>'<option value="">-- เลือกกรรมการ --</option>'+S.judges.map(j=>`<option value="${j.id}">${j.name}</option>`).join('');
+    const [j1,j2]=AeroS.pairAssign[pid];
+    return `<div class="aero-pair-card">
+      <div class="pair-label">PAIR ${pid}</div>
+      <select onchange="setAeroPairJudge('${pid}',0,this.value)">${opts()}</select>
+      <select onchange="setAeroPairJudge('${pid}',1,this.value)">${opts()}</select>
+      <div class="aero-pair-name" id="aero-pair-name-${pid}">${aeroPairLabel(pid)}</div>
+      ${crits.map(c=>`<span class="aero-crit-tag">${c.name} (${c.max}K)</span>`).join('')}
+    </div>`;
+  }).join('');
+  // restore selected values after innerHTML rebuild
+  AERO_PAIRS.forEach(pid=>{
+    const card=el.children[AERO_PAIRS.indexOf(pid)];
+    const sels=card.querySelectorAll('select');
+    sels[0].value=AeroS.pairAssign[pid][0]||'';
+    sels[1].value=AeroS.pairAssign[pid][1]||'';
+  });
+}
+
+function setAeroPairJudge(pid,slot,jid){
+  AeroS.pairAssign[pid][slot]=jid||null;
+  const lbl=document.getElementById(`aero-pair-name-${pid}`);
+  if(lbl) lbl.textContent=aeroPairLabel(pid);
+}
+
+function aeroPairLabel(pid){
+  const [j1,j2]=AeroS.pairAssign[pid];
+  const n1=S.judges.find(j=>j.id===j1)?.name;
+  const n2=S.judges.find(j=>j.id===j2)?.name;
+  if(n1&&n2) return `${n1} + ${n2}`;
+  if(n1||n2) return `${n1||n2} + (รอเลือก)`;
+  return 'ยังไม่ได้จับคู่';
+}
+
+function populateAeroSelectors(){
+  const sp=document.getElementById('aero-sel-pair');
+  if(!sp) return;
+  sp.innerHTML='<option value="">-- คู่กรรมการ --</option>'+AERO_PAIRS.map(pid=>
+    `<option value="${pid}">PAIR ${pid} · ${aeroPairLabel(pid)}</option>`).join('');
+}
+
+function renderAeroForm(){
+  const pid=document.getElementById('aero-sel-pair').value;
+  const pilotId=document.getElementById('c3d-sel-pilot').value;
+  const cid=AERO_TARGET_CLASSES[0];
+  const el=document.getElementById('c3d-content');
+  if(!pid||!pilotId||!cid){
+    el.innerHTML='<div class="empty-state"><div class="icon">🎵</div><p>เลือกคู่กรรมการ และนักบิน<br>เพื่อเริ่มให้คะแนน 3D Aeromusical</p></div>';
+    return;
+  }
+  const round=getAeroNextRound(cid,pid,pilotId);
+  document.getElementById('c3d-flight-badge').textContent=`ROUND ${round}`;
+  if(round>AERO_ROUNDS){
+    el.innerHTML=`<div class="empty-state"><div class="icon">✅</div><p>PAIR ${pid} ให้คะแนนนักบินคนนี้<br>ครบ ${AERO_ROUNDS} เที่ยวบินแล้ว</p></div>`;
+    return;
+  }
+  const crits=AERO_CRITERIA.filter(c=>c.pairId===pid);
+  const existing=getAeroObj(cid,pid,pilotId,round)||{};
+  let html='';
+  crits.forEach(c=>{
+    const cur=existing[c.id]!==undefined?existing[c.id]:-1;
+    html+=buildAeroCritCard(c, cur, cid, pid, pilotId, round);
+  });
+
+  // Penalty
+  const penKey=existing.penalty||'none';
+  html+=`<div class="penalty-box">
+    <div class="penalty-title">⚠️ PENALTY</div>
+    <div class="penalty-btns">`;
+  PENALTIES.forEach(pen=>{
+    html+=`<div class="pen-btn ${pen.cls} ${penKey===pen.id?'active':''}"
+      id="aero-pen-${pen.id}-${round}"
+      onclick="setAeroPenalty('${pen.id}','${cid}','${pid}','${pilotId}',${round})">${pen.icon} ${pen.label}</div>`;
+  });
+  html+=`</div>
+    <div class="pen-desc">
+      <strong style="color:var(--amber)">–5%</strong> เช่น บินเกินเวลา, ออกนอกขอบเขตเล็กน้อย &nbsp;|&nbsp;
+      <strong style="color:var(--red)">–10%</strong> เช่น ละเมิด safety line / safety zone
+    </div>
+  </div>`;
+
+  const maxTotal=crits.reduce((s,c)=>s+c.max,0);
+  const {raw,after,penPct}=calcAeroTotal(cid,pid,pilotId,round);
+  html+=`<div class="total-bar">
+    <div class="total-inner">
+      <div><div class="total-label">คะแนนหลัง Penalty · ROUND ${round}</div><div class="total-max">/ ${maxTotal} คะแนน</div></div>
+      <div class="total-val" id="aero-tot-after-${round}">${after.toFixed(2)}</div>
+    </div>
+    <div class="total-breakdown">
+      <div>คะแนนดิบ: <span id="aero-tot-raw-${round}">${raw.toFixed(1)}</span></div>
+      <div>Penalty: <span id="aero-tot-pen-${round}">${penPct>0?`<span class="pen-tag">−${penPct}%</span>`:'<span style="color:var(--green)">ไม่มี</span>'}</span></div>
+    </div>
+  </div>
+  <button class="btn-submit" id="aero-sub-btn"
+    onclick="openAeroModal('${cid}','${pid}','${pilotId}',${round})" ${raw<=0?'disabled':''}>
+    📤 ส่งคะแนน Round ${round}
+  </button>`;
+  el.innerHTML=html;
+}
+
+function buildAeroCritCard(c, cur, cid, pid, pilotId, round){
+  const notSet=(cur===-1);
+  let intRow='<div class="row-label">0–10</div><div class="score-row" style="flex:1;gap:4px">';
+  INT_STEPS.forEach(v=>{
+    const active=(!notSet&&cur===v);
+    intRow+=`<button class="sbtn ${active?'active':''}" onclick="setAeroScore('${c.id}',${v},'${cid}','${pid}','${pilotId}',${round},this)">${v}</button>`;
+  });
+  intRow+='</div>';
+  let halfRow='<div class="row-label">.5</div><div class="score-row" style="flex:1;gap:4px">';
+  HALF_STEPS.forEach(v=>{
+    const active=(!notSet&&cur===v);
+    halfRow+=`<button class="sbtn half ${active?'active':''}" onclick="setAeroScore('${c.id}',${v},'${cid}','${pid}','${pilotId}',${round},this)">${v}</button>`;
+  });
+  halfRow+='</div>';
+  const finalScore=notSet?0:+(cur/10*c.max).toFixed(2);
+  const scored=!notSet&&cur>0;
+  return `<div class="crit-card ${scored?'scored':''}" id="aero-cc-${c.id}-${round}">
+    <div class="crit-head">
+      <div>
+        <div class="crit-name">${c.name}</div>
+        <div class="crit-th">${c.th}</div>
+      </div>
+      <div class="crit-max">เต็ม ${c.max}K</div>
+    </div>
+    <div class="score-grid">
+      <div style="display:flex;gap:4px;align-items:center">${intRow}</div>
+      <div style="display:flex;gap:4px;align-items:center">${halfRow}</div>
+    </div>
+    <div class="crit-calc">
+      <div class="crit-calc-raw" id="aero-raw-${c.id}-${round}">${notSet?'–':cur.toFixed(1)}</div>
+      <div class="crit-calc-label">/10 ×${c.max/10}</div>
+      <div class="crit-calc-arrow">→</div>
+      <div class="crit-calc-final" id="aero-final-${c.id}-${round}">${finalScore}</div>
+      <div class="crit-calc-label">/${c.max}K</div>
+    </div>
+  </div>`;
+}
+
+function setAeroScore(critId,val,cid,pid,pilotId,round,btn){
+  ensureAeroObj(cid,pid,pilotId,round);
+  const d=AeroS.scores[cid][pid][pilotId][round];
+  d[critId]=(d[critId]===val)?-1:val;
+  const cur=d[critId];
+  const card=document.getElementById(`aero-cc-${critId}-${round}`);
+  if(card){
+    card.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('active'));
+    if(cur>=0){
+      card.querySelectorAll('.sbtn').forEach(b=>{ if(parseFloat(b.textContent)===cur) b.classList.add('active'); });
+      card.classList.add('scored');
+    } else card.classList.remove('scored');
+  }
+  const c=AERO_CRITERIA.find(x=>x.id===critId);
+  const rawEl=document.getElementById(`aero-raw-${critId}-${round}`);
+  const finalEl=document.getElementById(`aero-final-${critId}-${round}`);
+  if(rawEl) rawEl.textContent=cur>=0?cur.toFixed(1):'–';
+  if(finalEl) finalEl.textContent=cur>=0?(+(cur/10*c.max).toFixed(2)):'0';
+  refreshAeroTotals(cid,pid,pilotId,round);
+}
+
+function setAeroPenalty(penId,cid,pid,pilotId,round){
+  ensureAeroObj(cid,pid,pilotId,round);
+  AeroS.scores[cid][pid][pilotId][round].penalty=penId;
+  PENALTIES.forEach(p=>{
+    const btn=document.getElementById(`aero-pen-${p.id}-${round}`);
+    if(btn) btn.classList.toggle('active',p.id===penId);
+  });
+  refreshAeroTotals(cid,pid,pilotId,round);
+}
+
+function refreshAeroTotals(cid,pid,pilotId,round){
+  const {raw,after,penPct}=calcAeroTotal(cid,pid,pilotId,round);
+  const ta=document.getElementById(`aero-tot-after-${round}`);
+  const tr=document.getElementById(`aero-tot-raw-${round}`);
+  const tp=document.getElementById(`aero-tot-pen-${round}`);
+  if(ta) ta.textContent=after.toFixed(2);
+  if(tr) tr.textContent=raw.toFixed(1);
+  if(tp) tp.innerHTML=penPct>0?`<span class="pen-tag">−${penPct}%</span>`:'<span style="color:var(--green)">ไม่มี</span>';
+  const sb=document.getElementById('aero-sub-btn'); if(sb) sb.disabled=(raw<=0);
+}
+
+function calcAeroTotal(cid,pid,pilotId,round){
+  const d=getAeroObj(cid,pid,pilotId,round);
+  const crits=AERO_CRITERIA.filter(c=>c.pairId===pid);
+  const raw=d?crits.reduce((s,c)=>{ const v=d[c.id]; return s+(v>=0?(v/10*c.max):0); },0):0;
+  const penPct=PENALTIES.find(p=>p.id===(d?.penalty||'none'))?.pct||0;
+  const after=+(raw*(1-penPct/100)).toFixed(2);
+  return {raw,after,penPct};
+}
+
+function ensureAeroObj(cid,pid,pilotId,round){
+  if(!AeroS.scores[cid]) AeroS.scores[cid]={};
+  if(!AeroS.scores[cid][pid]) AeroS.scores[cid][pid]={};
+  if(!AeroS.scores[cid][pid][pilotId]) AeroS.scores[cid][pid][pilotId]={};
+  if(!AeroS.scores[cid][pid][pilotId][round]) AeroS.scores[cid][pid][pilotId][round]={penalty:'none',submitted:false};
+}
+function getAeroObj(cid,pid,pilotId,round){
+  return AeroS.scores[cid]?.[pid]?.[pilotId]?.[round]||null;
+}
+function getAeroNextRound(cid,pid,pilotId){
+  for(let r=1;r<=AERO_ROUNDS;r++){ const d=getAeroObj(cid,pid,pilotId,r); if(!d||!d.submitted) return r; }
+  return AERO_ROUNDS+1;
+}
+function getAeroFinal(cid,pid,pilotId,round){
+  const d=getAeroObj(cid,pid,pilotId,round);
+  if(!d||!d.submitted) return null;
+  return calcAeroTotal(cid,pid,pilotId,round).after;
+}
+
+let _aeroP=null;
+function openAeroModal(cid,pid,pilotId,round){
+  const {raw,after,penPct}=calcAeroTotal(cid,pid,pilotId,round);
+  const cDef=CLASSES.find(x=>x.id===cid);
+  const pname=S.pilots.find(p=>p.id===pilotId)?.name||'?';
+  const penLabel=penPct>0?`<span style="color:var(--red)">−${penPct}%</span>`:`<span style="color:var(--green)">ไม่มี</span>`;
+  document.getElementById('confirm-text').innerHTML=
+    `PAIR ${pid} (${aeroPairLabel(pid)}) → <strong>${pname}</strong><br>
+     ${cDef?.name||''} · Aeromusical · Round ${round}<br>
+     คะแนนดิบ: <strong>${raw.toFixed(1)}</strong> | Penalty: ${penLabel}<br>
+     <strong style="color:var(--accent);font-size:22px">${after.toFixed(2)}</strong> คะแนน<br><br>ยืนยัน?`;
+  _aeroP={cid,pid,pilotId,round};
+  document.getElementById('confirm-modal').classList.add('open');
+}
+
+// ══════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════
+async function loadFromSheet(){
+  setSyncStatus('syncing','⏳ กำลังโหลดจาก Sheet...');
+  showToast('⏳ กำลังโหลดข้อมูลจาก Sheet...');
+  const metaOk=await pullMeta();
+  if(metaOk){
+    renderClassGrid(); renderPilots(); renderJudgeSetup(); renderAeroPairSetup();
+    S.scores={}; AeroS.scores={};
+    const scoresOk=await pullAllScores();
+    S.started=true; S.bClass=CLASSES[0].id; S.bSub=null;
+    populateClassTabSelectors('basic');
+    populateClassTabSelectors('sportman');
+    populateClassTabSelectors('inter');
+    populateC3DPilots();
+    populateAeroSelectors();
+    populateSmackSelectors();
+    renderBoard();
+    showToast(scoresOk?'✅ โหลดสำเร็จ! ไปที่ Tab ให้คะแนนได้เลย':'⚠️ โหลด Meta ได้ แต่โหลดคะแนนไม่สำเร็จ');
+  } else {
+    showToast('❌ โหลดไม่สำเร็จ — ตรวจสอบ Wi-Fi หรือ Web App URL');
+    setSyncStatus('error');
+  }
+}
+
+async function refreshFromSheet(){
+  if(!S.started){showToast('กรุณาตั้งค่าและเริ่มการแข่งขันก่อน');return;}
+  showToast('⏳ กำลังรีเฟรชคะแนนจาก Sheet...');
+  const ok=await pullAllScores();
+  if(ok){ renderBoard(); updateTs(); showToast('✅ อัปเดตคะแนนล่าสุดแล้ว'); }
+  else showToast('❌ รีเฟรชไม่สำเร็จ — ตรวจสอบ Wi-Fi');
+}
+
+function showPage(p){
+  document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(e=>e.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  ['setup','basic','sportman','inter','class3d','board'].forEach((x,i)=>{if(x===p) document.querySelectorAll('.nav-tab')[i].classList.add('active');});
+  if(p==='board') renderBoard();
+  if(p==='basic') { populateClassTabSelectors('basic'); renderClassJudgeForm('basic'); }
+  if(p==='sportman') { populateClassTabSelectors('sportman'); renderClassJudgeForm('sportman'); }
+  if(p==='inter') { populateClassTabSelectors('inter'); renderClassJudgeForm('inter'); }
+  if(p==='class3d') {
+    populateC3DPilots();
+    populateAeroSelectors();
+    populateSmackSelectors();
+    onC3DSubChange();
+  }
+}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+function updateTs(){const d=new Date();document.getElementById('last-update').textContent=`อัปเดต ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;}
+setInterval(()=>{if(document.getElementById('page-board').classList.contains('active')){renderBoard();updateTs();}},5000);
+
+// INIT
+S.pilots=[{id:'p1',name:'',plane:''},{id:'p2',name:'',plane:''},{id:'p3',name:'',plane:''}];
+S.judges=[{id:'j1',name:''},{id:'j2',name:''},{id:'j3',name:''}];
+renderClassGrid(); renderPilots(); renderJudgeSetup(); renderAeroPairSetup();
+</script>
+</body>
+</html>
