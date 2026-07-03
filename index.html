@@ -916,6 +916,11 @@ function buildTotalBar(raw, penPct, after, round, maxScore){
 // ══════════════════════════════════════════════════
 // IMAC SEQUENCE DATA (2026 Known)
 // ══════════════════════════════════════════════════
+const ARESTI_BASE='https://bankykhlongkhlaew.github.io/3dac-score/aresti/';
+
+// map sid → image prefix
+const ARESTI_PREFIX={basic_imac:'basic',sportman_s:'sportman',inter_s:'inter'};
+
 const IMAC_SEQ={
   basic_imac:[
     {id:'f1', name:'Loop',                     k:10},
@@ -963,15 +968,16 @@ function buildIMACSeqForm(jid,pid,cid,sid,round,sDef,targetId){
   const penKey=existing.penalty||'none';
   const penPct=PENALTIES.find(p=>p.id===penKey)?.pct||0;
   const totalK=figs.reduce((s,f)=>s+f.k,0);
+  const imgPrefix=ARESTI_PREFIX[sid]||'basic';
 
   let html='';
 
-  // Fig cards
   figs.forEach(fig=>{
     const cur=existing[fig.id]!==undefined?existing[fig.id]:-1;
     const notSet=(cur===-1);
     const kScore=notSet?0:+(cur/10*fig.k).toFixed(1);
     const scored=!notSet&&cur>=0;
+    const imgUrl=`${ARESTI_BASE}${imgPrefix}_${fig.id}.jpg`;
 
     let intRow='<div class="row-label">0–10</div><div class="score-row" style="flex:1;gap:3px">';
     INT_STEPS.forEach(v=>{
@@ -989,20 +995,33 @@ function buildIMACSeqForm(jid,pid,cid,sid,round,sDef,targetId){
     halfRow+='</div>';
 
     html+=`<div class="mnv-card ${scored?'scored':''}" id="imac-fc-${fig.id}-${round}">
-      <div class="mnv-head">
-        <div class="mnv-num" style="font-size:11px">${fig.id.replace('f','')}</div>
-        <div style="flex:1">
-          <div class="mnv-name" style="font-size:14px">${fig.name}</div>
-          <div class="mnv-tip">K = ${fig.k}</div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <!-- Aresti image -->
+        <div style="flex-shrink:0;width:90px;text-align:center">
+          <img src="${imgUrl}" alt="Fig ${fig.id.replace('f','')}"
+            style="width:90px;height:90px;object-fit:contain;border-radius:8px;background:rgba(255,255,255,0.06);padding:4px"
+            onerror="this.style.display='none'">
+          <div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:11px;color:var(--dim);margin-top:3px">
+            Fig ${fig.id.replace('f','')}
+          </div>
         </div>
-        <div style="text-align:right">
-          <div class="mnv-disp" id="imac-sd-${fig.id}-${round}">${notSet?'–':cur.toFixed(1)}</div>
-          <div style="font-size:11px;color:var(--amber)" id="imac-ks-${fig.id}-${round}">${notSet?'–':kScore} pts</div>
+        <!-- Score section -->
+        <div style="flex:1;min-width:0">
+          <div class="mnv-head" style="margin-bottom:8px">
+            <div>
+              <div class="mnv-name" style="font-size:14px">${fig.name}</div>
+              <div class="mnv-tip">K = ${fig.k}</div>
+            </div>
+            <div style="text-align:right;margin-left:auto">
+              <div class="mnv-disp" id="imac-sd-${fig.id}-${round}">${notSet?'–':cur.toFixed(1)}</div>
+              <div style="font-size:11px;color:var(--amber)" id="imac-ks-${fig.id}-${round}">${notSet?'–':kScore} pts</div>
+            </div>
+          </div>
+          <div class="score-grid">
+            <div style="display:flex;gap:3px;align-items:center">${intRow}</div>
+            <div style="display:flex;gap:3px;align-items:center">${halfRow}</div>
+          </div>
         </div>
-      </div>
-      <div class="score-grid">
-        <div style="display:flex;gap:3px;align-items:center">${intRow}</div>
-        <div style="display:flex;gap:3px;align-items:center">${halfRow}</div>
       </div>
     </div>`;
   });
